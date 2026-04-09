@@ -158,12 +158,61 @@ export interface User {
   email: string;
   name: string;
   role: string;
+  tenantId?: number | null;
   createdAt?: string;
 }
 
 export interface AuthResponse {
   token: string;
   user: User;
+}
+
+export interface Tenant {
+  id: number;
+  slug: string;
+  domain: string | null;
+  name: string;
+  status: string;
+  plan: string;
+  createdAt: string;
+  updatedAt: string;
+  _count?: { users: number; products: number; orders: number; categories?: number; coupons?: number };
+  siteConfig?: SiteConfig | null;
+  users?: AdminUser[];
+}
+
+export interface AdminUser {
+  id: number;
+  email: string;
+  name: string;
+  role: string;
+  isActive: boolean;
+  tenantId: number | null;
+  tenant?: { id: number; name: string; slug: string } | null;
+  suspendedAt: string | null;
+  suspendReason: string | null;
+  lastLoginAt: string | null;
+  activatedAt: string | null;
+  createdAt: string;
+}
+
+export interface AuditLog {
+  id: number;
+  userId: number;
+  action: string;
+  entity: string;
+  entityId: number | null;
+  tenantId: number | null;
+  details: Record<string, unknown>;
+  ip: string;
+  createdAt: string;
+}
+
+export interface PlatformStats {
+  tenants: number;
+  admins: number;
+  orders: number;
+  revenue: number;
 }
 
 export interface Category {

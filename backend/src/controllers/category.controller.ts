@@ -2,11 +2,12 @@ import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { slugify } from '../utils/slug';
 
-export async function getCategories(_req: Request, res: Response) {
+export async function getCategories(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const categories = await prisma.category.findMany({
       include: { children: true, _count: { select: { products: true } } },
-      where: { parentId: null },
+      where: { tenantId, parentId: null },
       orderBy: { name: 'asc' },
     });
     res.json(categories);
@@ -16,10 +17,12 @@ export async function getCategories(_req: Request, res: Response) {
   }
 }
 
-export async function getAllCategories(_req: Request, res: Response) {
+export async function getAllCategories(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const categories = await prisma.category.findMany({
       include: { _count: { select: { products: true } } },
+      where: { tenantId },
       orderBy: { name: 'asc' },
     });
     res.json(categories);
@@ -31,12 +34,13 @@ export async function getAllCategories(_req: Request, res: Response) {
 
 export async function createCategory(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const { name, image, parentId } = req.body;
     if (!name) return res.status(400).json({ error: 'Nombre es requerido' });
 
     const slug = slugify(name);
     const category = await prisma.category.create({
-      data: { name, slug, image: image || '', parentId: parentId || null },
+      data: { tenantId, name, slug, image: image || '', parentId: parentId || null },
     });
     res.status(201).json(category);
   } catch (err) {
@@ -47,14 +51,19 @@ export async function createCategory(req: Request, res: Response) {
 
 export async function updateCategory(req: Request, res: Response) {
   try {
-    const { id } = req.params;
+    const tenantId = req.tenantId!;
+    const catId = Number(req.params.id);
+
+    const existing = await prisma.category.findFirst({ where: { id: catId, tenantId } });
+    if (!existing) return res.status(404).json({ error: 'Categoría no encontrada' });
+
     const { name, image, parentId } = req.body;
     const data: any = {};
     if (name) { data.name = name; data.slug = slugify(name); }
     if (image !== undefined) data.image = image;
     if (parentId !== undefined) data.parentId = parentId;
 
-    const category = await prisma.category.update({ where: { id: Number(id) }, data });
+    const category = await prisma.category.update({ where: { id: catId }, data });
     res.json(category);
   } catch (err) {
     console.error(err);
@@ -64,8 +73,13 @@ export async function updateCategory(req: Request, res: Response) {
 
 export async function deleteCategory(req: Request, res: Response) {
   try {
-    const { id } = req.params;
-    await prisma.category.delete({ where: { id: Number(id) } });
+    const tenantId = req.tenantId!;
+    const catId = Number(req.params.id);
+
+    const existing = await prisma.category.findFirst({ where: { id: catId, tenantId } });
+    if (!existing) return res.status(404).json({ error: 'Categoría no encontrada' });
+
+    await prisma.category.delete({ where: { id: catId } });
     res.json({ message: 'Categoría eliminada' });
   } catch (err) {
     console.error(err);

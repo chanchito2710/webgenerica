@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
-import { LayoutDashboard, Package, FolderTree, ShoppingCart, Settings, ChevronLeft, Home, Menu, X, Wrench, HelpCircle, Users, Tag, MapPin } from 'lucide-react';
+import { LayoutDashboard, Package, FolderTree, ShoppingCart, Settings, ChevronLeft, Home, Menu, X, Wrench, HelpCircle, Users, Tag, MapPin, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
@@ -18,7 +18,7 @@ const navItems = [
 ];
 
 export default function AdminLayout() {
-  const { isAdmin, loading } = useAuth();
+  const { isAdmin, isSuperAdmin, loading } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -27,10 +27,15 @@ export default function AdminLayout() {
 
   const navContent = (
     <>
-      <div className="p-4 border-b border-gray-800">
+      <div className="p-4 border-b border-gray-800 space-y-2">
         <Link to="/" className="flex items-center gap-2 text-sm text-gray-400 hover:text-white">
           <ChevronLeft size={16} /> Volver a la tienda
         </Link>
+        {isSuperAdmin && (
+          <Link to="/super-admin" className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300">
+            <Shield size={14} /> Super Admin
+          </Link>
+        )}
       </div>
       <nav className="p-3 space-y-1">
         {navItems.map((item) => {

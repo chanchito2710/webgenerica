@@ -17,11 +17,12 @@ const orderIncludes = {
 
 export async function createOrder(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const { shippingAddress, paymentMethod, shippingOptionId } = req.body;
     const userId = req.user!.userId;
 
     const cartItems = await prisma.cartItem.findMany({
-      where: { userId },
+      where: { userId, tenantId },
       include: { product: true, variant: true },
     });
 
@@ -47,6 +48,7 @@ export async function createOrder(req: Request, res: Response) {
 
     const order = await prisma.order.create({
       data: {
+        tenantId,
         userId,
         total,
         shippingAddress: shippingAddress || {},
@@ -57,7 +59,7 @@ export async function createOrder(req: Request, res: Response) {
       include: orderIncludes,
     });
 
-    await prisma.cartItem.deleteMany({ where: { userId } });
+    await prisma.cartItem.deleteMany({ where: { userId, tenantId } });
 
     const emailTo = order.user?.email;
     if (emailTo) {
@@ -84,6 +86,7 @@ export async function createOrder(req: Request, res: Response) {
 
 export async function createGuestOrder(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const { items, shippingAddress, shippingOptionId, paymentMethod } = req.body;
 
     if (!Array.isArray(items) || items.length === 0) {
@@ -95,7 +98,7 @@ export async function createGuestOrder(req: Request, res: Response) {
 
     const productIds = items.map((i: any) => Number(i.productId));
     const products = await prisma.product.findMany({
-      where: { id: { in: productIds }, active: true },
+      where: { id: { in: productIds }, tenantId, active: true },
       include: { variants: true },
     });
     const productMap = new Map(products.map((p) => [p.id, p]));
@@ -126,6 +129,7 @@ export async function createGuestOrder(req: Request, res: Response) {
 
     const order = await prisma.order.create({
       data: {
+        tenantId,
         guestEmail: shippingAddress.email,
         guestName: shippingAddress.fullName,
         total,
@@ -159,8 +163,9 @@ export async function createGuestOrder(req: Request, res: Response) {
 
 export async function getMyOrders(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const orders = await prisma.order.findMany({
-      where: { userId: req.user!.userId },
+      where: { userId: req.user!.userId, tenantId },
       include: orderIncludes,
       orderBy: { createdAt: 'desc' },
     });
@@ -173,13 +178,15 @@ export async function getMyOrders(req: Request, res: Response) {
 
 export async function getOrderById(req: Request, res: Response) {
   try {
-    const order = await prisma.order.findUnique({
-      where: { id: Number(req.params.id) },
+    const tenantId = req.tenantId!;
+    const order = await prisma.order.findFirst({
+      where: { id: Number(req.params.id), tenantId },
       include: orderIncludes,
     });
     if (!order) return res.status(404).json({ error: 'Orden no encontrada' });
 
-    if (req.user!.role !== 'admin' && order.userId !== req.user!.userId) {
+    const role = req.user!.role;
+    if (role !== 'admin' && role !== 'super_admin' && order.userId !== req.user!.userId) {
       return res.status(403).json({ error: 'Acceso denegado' });
     }
 
@@ -192,8 +199,9 @@ export async function getOrderById(req: Request, res: Response) {
 
 export async function getAllOrders(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const { status, page = '1', limit = '20' } = req.query;
-    const where: any = {};
+    const where: any = { tenantId };
     if (status) where.status = String(status);
 
     const pageNum = Math.max(1, Number(page));
@@ -214,13 +222,19 @@ export async function getAllOrders(req: Request, res: Response) {
 
 export async function updateOrderStatus(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
+    const orderId = Number(req.params.id);
+
+    const existing = await prisma.order.findFirst({ where: { id: orderId, tenantId } });
+    if (!existing) return res.status(404).json({ error: 'Orden no encontrada' });
+
     const { status, paymentStatus } = req.body;
     const data: any = {};
     if (status) data.status = status;
     if (paymentStatus) data.paymentStatus = paymentStatus;
 
     const order = await prisma.order.update({
-      where: { id: Number(req.params.id) },
+      where: { id: orderId },
       data,
       include: orderIncludes,
     });

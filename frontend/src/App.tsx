@@ -30,6 +30,11 @@ import AdminFAQ from './pages/admin/AdminFAQ';
 import AdminAbout from './pages/admin/AdminAbout';
 import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminContact from './pages/admin/AdminContact';
+import SuperAdminLayout from './pages/superadmin/SuperAdminLayout';
+import SADashboard from './pages/superadmin/SADashboard';
+import SATenants from './pages/superadmin/SATenants';
+import SAAdmins from './pages/superadmin/SAAdmins';
+import SAAudit from './pages/superadmin/SAAudit';
 import FAQ from './pages/FAQ';
 import AboutUs from './pages/AboutUs';
 import WhatsAppButton from './components/WhatsAppButton';
@@ -47,6 +52,13 @@ export default function App() {
             <CartProvider>
               <div className="min-h-screen flex flex-col bg-gray-50">
                 <Routes>
+                  <Route path="/super-admin/*" element={<SuperAdminLayout />}>
+                    <Route index element={<SADashboard />} />
+                    <Route path="tenants" element={<SATenants />} />
+                    <Route path="admins" element={<SAAdmins />} />
+                    <Route path="audit" element={<SAAudit />} />
+                  </Route>
+
                   <Route path="/admin/*" element={
                     <>
                       <Header />

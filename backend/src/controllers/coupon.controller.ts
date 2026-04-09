@@ -1,15 +1,18 @@
 import { RequestHandler } from 'express';
 import { prisma } from '../lib/prisma';
 
-export const getCoupons: RequestHandler = async (_req, res) => {
-  const coupons = await prisma.coupon.findMany({ orderBy: { createdAt: 'desc' } });
+export const getCoupons: RequestHandler = async (req, res) => {
+  const tenantId = req.tenantId!;
+  const coupons = await prisma.coupon.findMany({ where: { tenantId }, orderBy: { createdAt: 'desc' } });
   res.json(coupons);
 };
 
 export const createCoupon: RequestHandler = async (req, res) => {
+  const tenantId = req.tenantId!;
   const { code, type, value, minPurchase, maxUses, expiresAt, active } = req.body;
   const coupon = await prisma.coupon.create({
     data: {
+      tenantId,
       code: String(code).toUpperCase().trim(),
       type: type || 'percentage',
       value: Number(value) || 0,
@@ -23,10 +26,15 @@ export const createCoupon: RequestHandler = async (req, res) => {
 };
 
 export const updateCoupon: RequestHandler = async (req, res) => {
-  const { id } = req.params;
+  const tenantId = req.tenantId!;
+  const couponId = Number(req.params.id);
+
+  const existing = await prisma.coupon.findFirst({ where: { id: couponId, tenantId } });
+  if (!existing) { res.status(404).json({ error: 'Cupón no encontrado' }); return; }
+
   const { code, type, value, minPurchase, maxUses, expiresAt, active } = req.body;
   const coupon = await prisma.coupon.update({
-    where: { id: Number(id) },
+    where: { id: couponId },
     data: {
       ...(code !== undefined && { code: String(code).toUpperCase().trim() }),
       ...(type !== undefined && { type }),
@@ -41,19 +49,27 @@ export const updateCoupon: RequestHandler = async (req, res) => {
 };
 
 export const deleteCoupon: RequestHandler = async (req, res) => {
-  const { id } = req.params;
-  await prisma.coupon.delete({ where: { id: Number(id) } });
+  const tenantId = req.tenantId!;
+  const couponId = Number(req.params.id);
+
+  const existing = await prisma.coupon.findFirst({ where: { id: couponId, tenantId } });
+  if (!existing) { res.status(404).json({ error: 'Cupón no encontrado' }); return; }
+
+  await prisma.coupon.delete({ where: { id: couponId } });
   res.json({ message: 'Cupón eliminado' });
 };
 
 export const validateCoupon: RequestHandler = async (req, res) => {
+  const tenantId = req.tenantId!;
   const { code, cartTotal } = req.body;
   if (!code) {
     res.status(400).json({ error: 'Código requerido' });
     return;
   }
 
-  const coupon = await prisma.coupon.findUnique({ where: { code: String(code).toUpperCase().trim() } });
+  const coupon = await prisma.coupon.findFirst({
+    where: { code: String(code).toUpperCase().trim(), tenantId },
+  });
   if (!coupon || !coupon.active) {
     res.status(404).json({ error: 'Cupón no encontrado o inactivo' });
     return;

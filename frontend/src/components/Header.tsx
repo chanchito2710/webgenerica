@@ -10,7 +10,7 @@ import LiveSearch from './LiveSearch';
 import { SOCIAL_ICON_MAP } from './SocialIcons';
 
 export default function Header() {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, isSuperAdmin } = useAuth();
   const { totalItems } = useCart();
   const { config } = useSiteConfig();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -109,6 +109,11 @@ export default function Header() {
                 </button>
                 {userMenuOpen && (
                   <div className="absolute right-0 top-full mt-1 bg-white border rounded-lg shadow-lg py-2 min-w-[180px] z-50">
+                    {isSuperAdmin && (
+                      <Link to="/super-admin" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-indigo-700 hover:bg-indigo-50 font-medium">
+                        <LayoutDashboard size={16} /> Super Admin
+                      </Link>
+                    )}
                     {isAdmin && (
                       <Link to="/admin" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                         <LayoutDashboard size={16} /> Panel Admin

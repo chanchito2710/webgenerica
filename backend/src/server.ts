@@ -3,8 +3,11 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
+import fs from 'fs';
 import { config } from './config';
 import { errorHandler } from './middleware/errorHandler';
+import { resolveTenant } from './middleware/tenant';
+import { apiLimiter, authLimiter, superAdminLimiter } from './middleware/rateLimit';
 import { prisma } from './lib/prisma';
 
 import authRoutes from './routes/auth.routes';
@@ -15,6 +18,7 @@ import orderRoutes from './routes/order.routes';
 import configRoutes from './routes/config.routes';
 import uploadRoutes from './routes/upload.routes';
 import couponRoutes from './routes/coupon.routes';
+import superadminRoutes from './routes/superadmin.routes';
 
 const app = express();
 
@@ -27,7 +31,7 @@ const allowedOrigins = config.frontendUrl
 
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) cb(null, true);
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) cb(null, true);
     else cb(null, false);
   },
   credentials: true,
@@ -35,9 +39,17 @@ app.use(cors({
 app.use(morgan('dev'));
 app.use(express.json());
 
-app.use('/uploads', express.static(path.resolve(config.uploadDir)));
+const uploadsBase = path.resolve(config.uploadDir);
+if (!fs.existsSync(uploadsBase)) fs.mkdirSync(uploadsBase, { recursive: true });
+app.use('/uploads', express.static(uploadsBase));
 
-app.use('/api/auth', authRoutes);
+app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+
+app.use('/api/super-admin', superAdminLimiter, superadminRoutes);
+
+app.use('/api', apiLimiter, resolveTenant);
+
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
@@ -46,11 +58,8 @@ app.use('/api/config', configRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/coupons', couponRoutes);
 
-app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
-
 app.use(errorHandler);
 
-// Índices GIN para búsqueda de texto (idempotente; Prisma no declara GIN en schema)
 void (async () => {
   const stmts = [
     `CREATE INDEX IF NOT EXISTS idx_product_name_gin ON "Product" USING gin(to_tsvector('spanish', name))`,

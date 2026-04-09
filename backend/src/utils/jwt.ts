@@ -4,6 +4,7 @@ import { config } from '../config';
 export interface JwtPayload {
   userId: number;
   role: string;
+  tenantId: number | null;
 }
 
 export function signToken(payload: JwtPayload): string {

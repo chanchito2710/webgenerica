@@ -16,9 +16,13 @@ export default function Login() {
     try {
       await login(email, password);
       toast.success('Sesión iniciada');
-      navigate('/');
-    } catch {
-      toast.error('Credenciales inválidas');
+      const stored = localStorage.getItem('user');
+      const u = stored ? JSON.parse(stored) : null;
+      if (u?.role === 'super_admin') navigate('/super-admin');
+      else if (u?.role === 'admin') navigate('/admin');
+      else navigate('/');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.error || 'Credenciales inválidas');
     } finally {
       setLoading(false);
     }

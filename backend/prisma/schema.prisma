@@ -7,8 +7,33 @@ datasource db {
   provider = "postgresql"
 }
 
+// ─── Multi-tenant: cada Tenant es una tienda con su propio dominio ───
+
+model Tenant {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  domain    String?  @unique
+  name      String
+  status    String   @default("pending") // pending | active | suspended
+  plan      String   @default("free")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  siteConfig SiteConfig?
+  users      User[]
+  categories Category[]
+  products   Product[]
+  orders     Order[]
+  coupons    Coupon[]
+
+  @@index([domain])
+  @@index([status])
+}
+
 model SiteConfig {
   id          Int    @id @default(autoincrement())
+  tenantId    Int    @unique
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   siteName    String @default("WebGenerica")
   logo        String @default("")
   phone       String @default("")
@@ -32,21 +57,34 @@ model SiteConfig {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  password  String
-  name      String
-  role      String    @default("customer")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  orders    Order[]
-  cartItems CartItem[]
+  id              Int       @id @default(autoincrement())
+  email           String    @unique
+  password        String
+  name            String
+  role            String    @default("customer") // super_admin | admin | customer
+  tenantId        Int?
+  tenant          Tenant?   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  isActive        Boolean   @default(false)
+  activationToken String?
+  activatedAt     DateTime?
+  suspendedAt     DateTime?
+  suspendReason   String?
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  orders          Order[]
+  cartItems       CartItem[]
+
+  @@index([tenantId])
+  @@index([role])
 }
 
 model Category {
   id       Int        @id @default(autoincrement())
+  tenantId Int
+  tenant   Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   name     String
-  slug     String     @unique
+  slug     String
   image    String     @default("")
   parentId Int?
   parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
@@ -54,12 +92,17 @@ model Category {
   products Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
 }
 
 model Product {
   id          Int              @id @default(autoincrement())
+  tenantId    Int
+  tenant      Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   name        String
-  slug        String           @unique
+  slug        String
   description String           @default("")
   price       Decimal          @db.Decimal(10, 2)
   salePrice   Decimal?         @db.Decimal(10, 2)
@@ -74,6 +117,11 @@ model Product {
   orderItems  OrderItem[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+  @@index([tenantId, active])
+  @@index([tenantId, featured])
 }
 
 model ProductImage {
@@ -98,6 +146,7 @@ model ProductVariant {
 
 model CartItem {
   id        Int             @id @default(autoincrement())
+  tenantId  Int
   userId    Int
   user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId Int
@@ -109,10 +158,13 @@ model CartItem {
   updatedAt DateTime        @updatedAt
 
   @@unique([userId, productId, variantId])
+  @@index([tenantId])
 }
 
 model Order {
   id              Int         @id @default(autoincrement())
+  tenantId        Int
+  tenant          Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   userId          Int?
   user            User?       @relation(fields: [userId], references: [id])
   guestEmail      String      @default("")
@@ -126,6 +178,9 @@ model Order {
   items           OrderItem[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
+
+  @@index([tenantId])
+  @@index([tenantId, status])
 }
 
 model OrderItem {
@@ -142,7 +197,9 @@ model OrderItem {
 
 model Coupon {
   id          Int       @id @default(autoincrement())
-  code        String    @unique
+  tenantId    Int
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  code        String
   type        String    @default("percentage")
   value       Float
   minPurchase Float     @default(0)
@@ -152,4 +209,23 @@ model Coupon {
   active      Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@unique([tenantId, code])
+  @@index([tenantId])
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  action    String
+  entity    String
+  entityId  Int?
+  tenantId  Int?
+  details   Json     @default("{}")
+  ip        String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tenantId])
+  @@index([action])
 }

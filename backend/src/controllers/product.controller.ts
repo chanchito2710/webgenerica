@@ -10,10 +10,11 @@ const productIncludes = {
 
 export async function getProducts(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const { category, featured, search, sort, page = '1', limit = '12' } = req.query;
-    const where: any = { active: true };
+    const where: any = { tenantId, active: true };
 
-    if (category) where.category = { slug: String(category) };
+    if (category) where.category = { slug: String(category), tenantId };
     if (featured === 'true') where.featured = true;
     if (search) {
       where.OR = [
@@ -52,8 +53,9 @@ export async function getProducts(req: Request, res: Response) {
 
 export async function getProductBySlug(req: Request, res: Response) {
   try {
-    const product = await prisma.product.findUnique({
-      where: { slug: String(req.params.slug) },
+    const tenantId = req.tenantId!;
+    const product = await prisma.product.findFirst({
+      where: { slug: String(req.params.slug), tenantId },
       include: productIncludes,
     });
     if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
@@ -66,8 +68,9 @@ export async function getProductBySlug(req: Request, res: Response) {
 
 export async function getProductById(req: Request, res: Response) {
   try {
-    const product = await prisma.product.findUnique({
-      where: { id: Number(String(req.params.id)) },
+    const tenantId = req.tenantId!;
+    const product = await prisma.product.findFirst({
+      where: { id: Number(String(req.params.id)), tenantId },
       include: productIncludes,
     });
     if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
@@ -80,14 +83,15 @@ export async function getProductById(req: Request, res: Response) {
 
 export async function getAllProducts(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const { page = '1', limit = '20' } = req.query;
     const pageNum = Math.max(1, Number(page));
     const take = Math.min(100, Math.max(1, Number(limit)));
     const skip = (pageNum - 1) * take;
 
     const [products, total] = await Promise.all([
-      prisma.product.findMany({ include: productIncludes, skip, take, orderBy: { createdAt: 'desc' } }),
-      prisma.product.count(),
+      prisma.product.findMany({ where: { tenantId }, include: productIncludes, skip, take, orderBy: { createdAt: 'desc' } }),
+      prisma.product.count({ where: { tenantId } }),
     ]);
 
     res.json({ products, total, page: pageNum, pages: Math.ceil(total / take) });
@@ -99,6 +103,7 @@ export async function getAllProducts(req: Request, res: Response) {
 
 export async function createProduct(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const { name, description, price, salePrice, stock, featured, active, categoryId, images, variants } = req.body;
     if (!name || !price || !categoryId) {
       return res.status(400).json({ error: 'Nombre, precio y categoría son requeridos' });
@@ -107,8 +112,8 @@ export async function createProduct(req: Request, res: Response) {
     const slug = slugify(name);
     const product = await prisma.product.create({
       data: {
-        name,
-        slug,
+        tenantId,
+        name, slug,
         description: description || '',
         price,
         salePrice: salePrice || null,
@@ -131,7 +136,13 @@ export async function createProduct(req: Request, res: Response) {
 
 export async function updateProduct(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const { id } = req.params;
+    const productId = Number(id);
+
+    const existing = await prisma.product.findFirst({ where: { id: productId, tenantId } });
+    if (!existing) return res.status(404).json({ error: 'Producto no encontrado' });
+
     const { name, description, price, salePrice, stock, featured, active, categoryId, images, variants } = req.body;
     const data: any = {};
 
@@ -145,15 +156,15 @@ export async function updateProduct(req: Request, res: Response) {
     if (categoryId !== undefined) data.categoryId = categoryId;
 
     if (images) {
-      await prisma.productImage.deleteMany({ where: { productId: Number(id) } });
+      await prisma.productImage.deleteMany({ where: { productId } });
       data.images = { create: images.map((img: any, i: number) => ({ url: img.url, order: i })) };
     }
     if (variants) {
-      await prisma.productVariant.deleteMany({ where: { productId: Number(id) } });
+      await prisma.productVariant.deleteMany({ where: { productId } });
       data.variants = { create: variants.map((v: any) => ({ name: v.name, value: v.value, priceAdjust: v.priceAdjust || 0, stock: v.stock || 0 })) };
     }
 
-    const product = await prisma.product.update({ where: { id: Number(id) }, data, include: productIncludes });
+    const product = await prisma.product.update({ where: { id: productId }, data, include: productIncludes });
     res.json(product);
   } catch (err) {
     console.error(err);
@@ -163,8 +174,13 @@ export async function updateProduct(req: Request, res: Response) {
 
 export async function deleteProduct(req: Request, res: Response) {
   try {
-    const { id } = req.params;
-    await prisma.product.delete({ where: { id: Number(id) } });
+    const tenantId = req.tenantId!;
+    const productId = Number(req.params.id);
+
+    const existing = await prisma.product.findFirst({ where: { id: productId, tenantId } });
+    if (!existing) return res.status(404).json({ error: 'Producto no encontrado' });
+
+    await prisma.product.delete({ where: { id: productId } });
     res.json({ message: 'Producto eliminado' });
   } catch (err) {
     console.error(err);

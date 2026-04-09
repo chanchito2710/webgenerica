@@ -5,6 +5,7 @@ import { signToken } from '../utils/jwt';
 
 export async function register(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const { email, password, name } = req.body;
     if (!email || !password || !name) {
       return res.status(400).json({ error: 'Todos los campos son requeridos' });
@@ -17,13 +18,13 @@ export async function register(req: Request, res: Response) {
 
     const hashed = await hashPassword(password);
     const user = await prisma.user.create({
-      data: { email, password: hashed, name },
+      data: { email, password: hashed, name, tenantId, isActive: true },
     });
 
-    const token = signToken({ userId: user.id, role: user.role });
+    const token = signToken({ userId: user.id, role: user.role, tenantId: user.tenantId });
     res.status(201).json({
       token,
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role, tenantId: user.tenantId },
     });
   } catch (err) {
     console.error(err);
@@ -43,15 +44,25 @@ export async function login(req: Request, res: Response) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
+    if (!user.isActive) {
+      return res.status(403).json({ error: 'Cuenta no activada. Revisá tu email.' });
+    }
+
+    if (user.suspendedAt) {
+      return res.status(403).json({ error: 'Cuenta suspendida. Contactá al administrador.' });
+    }
+
     const valid = await comparePassword(password, user.password);
     if (!valid) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    const token = signToken({ userId: user.id, role: user.role });
+    await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
+
+    const token = signToken({ userId: user.id, role: user.role, tenantId: user.tenantId });
     res.json({
       token,
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: { id: user.id, email: user.email, name: user.name, role: user.role, tenantId: user.tenantId },
     });
   } catch (err) {
     console.error(err);
@@ -63,12 +74,35 @@ export async function getProfile(req: Request, res: Response) {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user!.userId },
-      select: { id: true, email: true, name: true, role: true, createdAt: true },
+      select: { id: true, email: true, name: true, role: true, tenantId: true, createdAt: true },
     });
     if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
     res.json(user);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error al obtener perfil' });
+  }
+}
+
+export async function activateAccount(req: Request, res: Response) {
+  try {
+    const token = String(req.params.token);
+    const user = await prisma.user.findFirst({ where: { activationToken: token } });
+    if (!user) {
+      return res.status(404).json({ error: 'Token de activación inválido' });
+    }
+    if (user.isActive) {
+      return res.json({ message: 'La cuenta ya está activa' });
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { isActive: true, activationToken: null, activatedAt: new Date() },
+    });
+
+    res.json({ message: 'Cuenta activada exitosamente. Ya podés iniciar sesión.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al activar cuenta' });
   }
 }

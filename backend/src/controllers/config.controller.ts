@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 
-export async function getSiteConfig(_req: Request, res: Response) {
+export async function getSiteConfig(req: Request, res: Response) {
   try {
-    let config = await prisma.siteConfig.findFirst();
+    const tenantId = req.tenantId!;
+    let config = await prisma.siteConfig.findUnique({ where: { tenantId } });
     if (!config) {
-      config = await prisma.siteConfig.create({ data: {} });
+      config = await prisma.siteConfig.create({ data: { tenantId } });
     }
     res.json(config);
   } catch (err) {
@@ -16,49 +17,21 @@ export async function getSiteConfig(_req: Request, res: Response) {
 
 export async function updateSiteConfig(req: Request, res: Response) {
   try {
+    const tenantId = req.tenantId!;
     const {
-      siteName,
-      logo,
-      phone,
-      email,
-      address,
-      socialLinks,
-      theme,
-      currency,
-      heroBanner,
-      benefits,
-      shippingOptions,
-      servicioTecnico,
-      faq,
-      aboutPage,
-      contactPage,
-      instagramSection,
-      promoBanner,
-      footerDescription,
+      siteName, logo, phone, email, address, socialLinks, theme, currency,
+      heroBanner, benefits, shippingOptions, servicioTecnico, faq,
+      aboutPage, contactPage, instagramSection, promoBanner, footerDescription,
     } = req.body;
-    let config = await prisma.siteConfig.findFirst();
+
+    let config = await prisma.siteConfig.findUnique({ where: { tenantId } });
 
     if (!config) {
       config = await prisma.siteConfig.create({
         data: {
-          siteName,
-          logo,
-          phone,
-          email,
-          address,
-          socialLinks,
-          theme,
-          currency,
-          heroBanner,
-          benefits,
-          shippingOptions,
-          servicioTecnico,
-          faq,
-          aboutPage,
-          contactPage,
-          instagramSection,
-          promoBanner,
-          footerDescription,
+          tenantId, siteName, logo, phone, email, address, socialLinks, theme,
+          currency, heroBanner, benefits, shippingOptions, servicioTecnico, faq,
+          aboutPage, contactPage, instagramSection, promoBanner, footerDescription,
         },
       });
     } else {
@@ -82,7 +55,7 @@ export async function updateSiteConfig(req: Request, res: Response) {
       if (promoBanner !== undefined) data.promoBanner = promoBanner;
       if (footerDescription !== undefined) data.footerDescription = footerDescription;
 
-      config = await prisma.siteConfig.update({ where: { id: config.id }, data });
+      config = await prisma.siteConfig.update({ where: { tenantId }, data });
     }
 
     res.json(config);
