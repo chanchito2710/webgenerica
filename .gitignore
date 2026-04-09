@@ -1,0 +1,29 @@
+node_modules
+dist
+.env
+*.local
+
+# Uploads (served by backend, not versioned)
+uploads/
+
+# Empty legacy folder
+base datos/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Logs
+logs
+*.log
+npm-debug.log*

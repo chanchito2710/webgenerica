@@ -1,0 +1,244 @@
+import { useEffect, useState } from 'react';
+import { Plus, Trash2 } from 'lucide-react';
+import { configService } from '../../services/config.service';
+import { useSiteConfig } from '../../context/SiteConfigContext';
+import type { ServicePageConfig, ServiceCard } from '../../types';
+import toast from 'react-hot-toast';
+
+const ICON_OPTIONS = [
+  { value: 'smartphone', label: 'Celular' },
+  { value: 'tablet', label: 'Tablet' },
+  { value: 'monitor', label: 'Monitor' },
+  { value: 'wrench', label: 'Llave' },
+  { value: 'check-circle', label: 'Check' },
+  { value: 'clock', label: 'Reloj' },
+  { value: 'shield', label: 'Escudo' },
+  { value: 'cpu', label: 'CPU' },
+  { value: 'hard-drive', label: 'Disco' },
+  { value: 'wifi', label: 'WiFi' },
+  { value: 'battery', label: 'Batería' },
+  { value: 'camera', label: 'Cámara' },
+  { value: 'headphones', label: 'Auriculares' },
+  { value: 'zap', label: 'Rayo' },
+  { value: 'star', label: 'Estrella' },
+  { value: 'heart', label: 'Corazón' },
+  { value: 'truck', label: 'Camión' },
+  { value: 'tool', label: 'Herramienta' },
+];
+
+const DEFAULT_CONFIG: ServicePageConfig = {
+  heroTitle: 'Servicio Técnico',
+  heroSubtitle: 'Nos especializamos en la reparación integral de teléfonos móviles, tablets y dispositivos electrónicos. Servicio profesional, eficiente y con garantía.',
+  descTitle: 'Servicio de reparación',
+  descBody: '',
+  servicesTitle: '¿Qué reparamos?',
+  services: [],
+  benefitsTitle: '¿Por qué elegirnos?',
+  benefits: [],
+  ctaTitle: '¿Tu celular necesita atención?',
+  ctaSubtitle: 'Escribinos ahora por WhatsApp y te asesoramos sin compromiso.',
+  ctaWhatsappMessage: 'Hola, necesito reparar mi dispositivo.',
+};
+
+function CardEditor({
+  cards,
+  onChange,
+  sectionLabel,
+}: {
+  cards: ServiceCard[];
+  onChange: (cards: ServiceCard[]) => void;
+  sectionLabel: string;
+}) {
+  const add = () => onChange([...cards, { icon: 'wrench', title: '', desc: '' }]);
+  const remove = (i: number) => onChange(cards.filter((_, idx) => idx !== i));
+  const update = (i: number, field: keyof ServiceCard, value: string) => {
+    const updated = [...cards];
+    updated[i] = { ...updated[i], [field]: value };
+    onChange(updated);
+  };
+
+  const inputClass = 'w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary';
+
+  return (
+    <div className="space-y-3">
+      {cards.map((card, i) => (
+        <div key={i} className="border rounded-lg p-4 bg-gray-50 space-y-3">
+          <div className="flex items-start gap-3">
+            <div className="shrink-0">
+              <label className="text-xs text-gray-500 mb-1 block">Ícono</label>
+              <select
+                className="border rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                value={card.icon}
+                onChange={(e) => update(i, 'icon', e.target.value)}
+              >
+                {ICON_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex-1 space-y-2">
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Título</label>
+                <input
+                  className={inputClass}
+                  value={card.title}
+                  onChange={(e) => update(i, 'title', e.target.value)}
+                  placeholder={`Título del ${sectionLabel}`}
+                />
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 mb-1 block">Descripción</label>
+                <input
+                  className={inputClass}
+                  value={card.desc}
+                  onChange={(e) => update(i, 'desc', e.target.value)}
+                  placeholder="Descripción breve"
+                />
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => remove(i)}
+              className="p-2 text-red-500 hover:bg-red-50 rounded-lg mt-5"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={add}
+        className="flex items-center gap-1 text-sm text-primary hover:text-primary-dark font-medium"
+      >
+        <Plus size={16} /> Agregar {sectionLabel}
+      </button>
+    </div>
+  );
+}
+
+export default function AdminServicioTecnico() {
+  const { refresh } = useSiteConfig();
+  const [data, setData] = useState<ServicePageConfig>(DEFAULT_CONFIG);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    configService.getSiteConfig().then((cfg) => {
+      const raw = (cfg as any).servicioTecnico;
+      if (raw && typeof raw === 'object' && raw.heroTitle) {
+        setData({ ...DEFAULT_CONFIG, ...raw });
+      }
+    }).finally(() => setLoading(false));
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await configService.updateSiteConfig({ servicioTecnico: data });
+      await refresh();
+      toast.success('Servicio Técnico actualizado');
+    } catch {
+      toast.error('Error al guardar');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const updateField = <K extends keyof ServicePageConfig>(field: K, value: ServicePageConfig[K]) => {
+    setData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  if (loading) return <div className="text-center py-8 text-gray-400">Cargando...</div>;
+
+  const inputClass = 'w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary';
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Editar Servicio Técnico</h1>
+
+      <form onSubmit={handleSave} className="space-y-6 max-w-3xl">
+        {/* Hero */}
+        <div className="bg-white border rounded-lg p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-800">Banner principal</h2>
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block">Título</label>
+            <input className={inputClass} value={data.heroTitle} onChange={(e) => updateField('heroTitle', e.target.value)} />
+          </div>
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block">Subtítulo</label>
+            <textarea
+              className={inputClass + ' min-h-[80px]'}
+              value={data.heroSubtitle}
+              onChange={(e) => updateField('heroSubtitle', e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="bg-white border rounded-lg p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-800">Descripción</h2>
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block">Título de sección</label>
+            <input className={inputClass} value={data.descTitle} onChange={(e) => updateField('descTitle', e.target.value)} />
+          </div>
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block">Texto descriptivo</label>
+            <textarea
+              className={inputClass + ' min-h-[120px]'}
+              value={data.descBody}
+              onChange={(e) => updateField('descBody', e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Services */}
+        <div className="bg-white border rounded-lg p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-800">Servicios</h2>
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block">Título de sección</label>
+            <input className={inputClass} value={data.servicesTitle} onChange={(e) => updateField('servicesTitle', e.target.value)} />
+          </div>
+          <CardEditor cards={data.services} onChange={(s) => updateField('services', s)} sectionLabel="servicio" />
+        </div>
+
+        {/* Benefits */}
+        <div className="bg-white border rounded-lg p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-800">Beneficios</h2>
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block">Título de sección</label>
+            <input className={inputClass} value={data.benefitsTitle} onChange={(e) => updateField('benefitsTitle', e.target.value)} />
+          </div>
+          <CardEditor cards={data.benefits} onChange={(b) => updateField('benefits', b)} sectionLabel="beneficio" />
+        </div>
+
+        {/* CTA WhatsApp */}
+        <div className="bg-white border rounded-lg p-6 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-800">Llamada a la acción (WhatsApp)</h2>
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block">Título</label>
+            <input className={inputClass} value={data.ctaTitle} onChange={(e) => updateField('ctaTitle', e.target.value)} />
+          </div>
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block">Subtítulo</label>
+            <input className={inputClass} value={data.ctaSubtitle} onChange={(e) => updateField('ctaSubtitle', e.target.value)} />
+          </div>
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block">Mensaje predeterminado de WhatsApp</label>
+            <input className={inputClass} value={data.ctaWhatsappMessage} onChange={(e) => updateField('ctaWhatsappMessage', e.target.value)} />
+          </div>
+          <p className="text-xs text-gray-400">El número de teléfono se toma de la configuración general del sitio.</p>
+        </div>
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
+        >
+          {saving ? 'Guardando...' : 'Guardar Cambios'}
+        </button>
+      </form>
+    </div>
+  );
+}
