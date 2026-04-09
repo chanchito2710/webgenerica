@@ -1,0 +1,35 @@
+-- AlterTable SiteConfig: add missing columns
+ALTER TABLE "SiteConfig" ADD COLUMN IF NOT EXISTS "shippingOptions" JSONB NOT NULL DEFAULT '[]';
+ALTER TABLE "SiteConfig" ADD COLUMN IF NOT EXISTS "servicioTecnico" JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE "SiteConfig" ADD COLUMN IF NOT EXISTS "faq" JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE "SiteConfig" ADD COLUMN IF NOT EXISTS "aboutPage" JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE "SiteConfig" ADD COLUMN IF NOT EXISTS "contactPage" JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE "SiteConfig" ADD COLUMN IF NOT EXISTS "instagramSection" JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE "SiteConfig" ADD COLUMN IF NOT EXISTS "promoBanner" JSONB NOT NULL DEFAULT '{}';
+ALTER TABLE "SiteConfig" ADD COLUMN IF NOT EXISTS "footerDescription" TEXT NOT NULL DEFAULT '';
+
+-- AlterTable Order: guest checkout support
+ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "guestEmail" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "guestName" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "shippingOption" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "Order" ALTER COLUMN "userId" DROP NOT NULL;
+
+-- CreateTable Coupon
+CREATE TABLE IF NOT EXISTS "Coupon" (
+    "id" SERIAL NOT NULL,
+    "code" TEXT NOT NULL,
+    "type" TEXT NOT NULL DEFAULT 'percentage',
+    "value" DOUBLE PRECISION NOT NULL,
+    "minPurchase" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "maxUses" INTEGER NOT NULL DEFAULT 0,
+    "usedCount" INTEGER NOT NULL DEFAULT 0,
+    "expiresAt" TIMESTAMP(3),
+    "active" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Coupon_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX IF NOT EXISTS "Coupon_code_key" ON "Coupon"("code");
