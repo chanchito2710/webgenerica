@@ -93,7 +93,10 @@ async function resolveByDomain(domain: string, req: Request, res: Response, next
         where: { domain },
         select: { id: true, slug: true, domain: true, name: true, status: true },
       });
-      if (!row) { res.status(404).json({ error: 'Tienda no encontrada para este dominio' }); return; }
+      if (!row) {
+        // Fallback: if no tenant matched this domain, use "default"
+        return resolveBySlug('default', req, res, next);
+      }
       tenant = row;
       setCache(cacheKey, tenant);
     }
