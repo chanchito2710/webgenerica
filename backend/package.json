@@ -7,7 +7,8 @@
     "build": "npx prisma generate && tsc",
     "migrate:deploy": "npx prisma migrate deploy",
     "start": "node dist/server.js",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "seed:super-admin": "tsx src/seed-super-admin-only.ts"
   },
   "keywords": [],
   "author": "",

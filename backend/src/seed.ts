@@ -1,4 +1,5 @@
 import { prisma } from './lib/prisma';
+import { ensureSuperAdminUser } from './lib/ensureSuperAdminUser';
 import { hashPassword } from './utils/password';
 
 async function main() {
@@ -49,21 +50,7 @@ async function main() {
     },
   });
 
-  // Super Admin user
-  const superAdminPassword = await hashPassword(process.env.SUPER_ADMIN_PASSWORD || 'superadmin123');
-  await prisma.user.upsert({
-    where: { email: process.env.SUPER_ADMIN_EMAIL || 'superadmin@webgenerica.com' },
-    update: {},
-    create: {
-      email: process.env.SUPER_ADMIN_EMAIL || 'superadmin@webgenerica.com',
-      password: superAdminPassword,
-      name: 'Super Administrador',
-      role: 'super_admin',
-      tenantId: null,
-      isActive: true,
-      activatedAt: new Date(),
-    },
-  });
+  await ensureSuperAdminUser();
 
   // Admin user for default tenant
   const adminPassword = await hashPassword('admin123');
