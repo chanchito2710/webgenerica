@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>WebGenerica - Instructivo de uso</title>
+<style>
+  @media print {
+    body { font-size: 11pt; }
+    h1 { font-size: 22pt; }
+    h2 { font-size: 16pt; break-before: auto; }
+    h3 { font-size: 13pt; }
+    table { font-size: 10pt; }
+    .no-print { display: none; }
+    a { color: #333; text-decoration: none; }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a1a; line-height: 1.7; max-width: 800px; margin: 0 auto; padding: 40px 30px; }
+  h1 { font-size: 28px; color: #1e40af; border-bottom: 3px solid #1e40af; padding-bottom: 10px; margin-bottom: 20px; }
+  h2 { font-size: 20px; color: #1e40af; margin-top: 35px; margin-bottom: 12px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+  h3 { font-size: 16px; color: #333; margin-top: 20px; margin-bottom: 8px; }
+  p, li { margin-bottom: 6px; }
+  ul, ol { padding-left: 24px; margin-bottom: 12px; }
+  strong { color: #111; }
+  code { background: #f1f5f9; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; color: #dc2626; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  th, td { border: 1px solid #d1d5db; padding: 8px 10px; text-align: left; }
+  th { background: #1e40af; color: white; font-weight: 600; }
+  tr:nth-child(even) { background: #f8fafc; }
+  hr { border: none; border-top: 1px solid #e5e7eb; margin: 25px 0; }
+  .badge { display: inline-block; background: #1e40af; color: white; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .limitation { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 10px 0; border-radius: 0 6px 6px 0; }
+  .limitation strong { color: #92400e; }
+  .solution { color: #065f46; }
+  .print-btn { position: fixed; bottom: 20px; right: 20px; background: #1e40af; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 15px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  .print-btn:hover { background: #1e3a8a; }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">Guardar como PDF</button>
+
+<h1>WebGenerica - Instructivo de uso</h1>
+
+<h2>Que es WebGenerica</h2>
+<p>WebGenerica es una plataforma e-commerce lista para usar. Funciona como una tienda online completa que se puede personalizar para cualquier tipo de negocio <strong>sin tocar codigo</strong>. Todo se configura desde el panel de administracion.</p>
+<p>La tienda incluye: catalogo de productos, carrito de compras, checkout con opciones de envio, sistema de cupones, paginas informativas (FAQ, Contacto, Quienes Somos, Servicio Tecnico) y un panel admin completo.</p>
+
+<hr>
+
+<h2>Accesos</h2>
+<table>
+  <tr><th>Que</th><th>URL</th></tr>
+  <tr><td>Tienda (produccion)</td><td>https://webgenerica.vercel.app</td></tr>
+  <tr><td>Panel Admin</td><td>https://webgenerica.vercel.app/login</td></tr>
+  <tr><td>API Backend</td><td>https://webgenerica-api.onrender.com</td></tr>
+  <tr><td>Repositorio</td><td>https://github.com/chanchito2710/webgenerica</td></tr>
+</table>
+<p><strong>Credenciales de administrador:</strong></p>
+<ul>
+  <li>Email: <code>admin@webgenerica.com</code></li>
+  <li>Contraseña: <code>admin123</code></li>
+</ul>
+<p><strong>Credenciales de cliente de prueba:</strong></p>
+<ul>
+  <li>Email: <code>cliente@test.com</code></li>
+  <li>Contraseña: <code>cliente123</code></li>
+</ul>
+
+<hr>
+
+<h2>Paginas publicas (lo que ve el cliente)</h2>
+<table>
+  <tr><th>Pagina</th><th>Ruta</th><th>Descripcion</th></tr>
+  <tr><td>Inicio</td><td><code>/</code></td><td>Hero con carrusel, beneficios, categorias, productos destacados, ofertas, banner promo</td></tr>
+  <tr><td>Tienda</td><td><code>/tienda</code></td><td>Catalogo con filtros por categoria, busqueda, ordenamiento</td></tr>
+  <tr><td>Detalle de producto</td><td><code>/producto/:slug</code></td><td>Fotos, precio, variantes, agregar al carrito</td></tr>
+  <tr><td>Carrito</td><td><code>/carrito</code></td><td>Items, cantidades, opciones de envio, resumen</td></tr>
+  <tr><td>Checkout</td><td><code>/checkout</code></td><td>Formulario de datos, direccion, metodo de pago</td></tr>
+  <tr><td>Confirmacion</td><td><code>/orden-confirmada</code></td><td>Resumen de la orden completada</td></tr>
+  <tr><td>Servicio Tecnico</td><td><code>/servicio-tecnico</code></td><td>Info del servicio, CTA de WhatsApp</td></tr>
+  <tr><td>FAQ</td><td><code>/preguntas-frecuentes</code></td><td>Acordeon de preguntas/respuestas</td></tr>
+  <tr><td>Contacto</td><td><code>/contacto</code></td><td>Telefonos, mapa Google Maps, horarios</td></tr>
+  <tr><td>Quienes Somos</td><td><code>/quienes-somos</code></td><td>Historia, imagen, puntos destacados</td></tr>
+  <tr><td>Login / Registro</td><td><code>/login</code>, <code>/registro</code></td><td>Acceso y creacion de cuenta</td></tr>
+  <tr><td>Mis Pedidos</td><td><code>/mis-pedidos</code></td><td>Historial de compras del usuario</td></tr>
+</table>
+
+<hr>
+
+<h2>Panel de Administracion</h2>
+<p>Se accede desde el boton "Administrador" en el header (visible solo si estas logueado como admin).</p>
+
+<h3>Dashboard <span class="badge">/admin</span></h3>
+<p>Resumen rapido con 3 tarjetas: total de productos, total de pedidos e ingresos totales.</p>
+
+<h3>Editar Inicio <span class="badge">/admin/inicio</span></h3>
+<p>Controla todo lo que se ve en la pagina principal:</p>
+<p><strong>Carrusel Hero:</strong></p>
+<ul>
+  <li>Agregar multiples slides (reordenables arrastrando)</li>
+  <li>Dos tipos: "Generico" (imagen de fondo) o "Producto destacado"</li>
+  <li>Imagen escritorio y celular separadas</li>
+  <li>Titulo, subtitulo, texto adicional</li>
+  <li>Tipografia: fuente Google, tamaño, peso, color</li>
+  <li>Layout: centrado, izquierda, derecha, esquinas</li>
+  <li>Overlay: color y opacidad sobre la imagen</li>
+  <li>Botones: texto, URL, estilo (relleno/borde), colores, reordenables</li>
+</ul>
+<p><strong>Beneficios:</strong> tarjetas debajo del hero con icono predefinido o personalizado, titulo y descripcion.</p>
+<p><strong>Seccion Instagram:</strong> titulo, URL del perfil, nombre de usuario. Se muestra como bloque con boton "Seguir".</p>
+<p><strong>Banner Promocional:</strong> imagen, titulo, subtitulo, URL y texto del enlace.</p>
+
+<h3>Productos <span class="badge">/admin/productos</span></h3>
+<ul>
+  <li>Crear, editar y eliminar productos</li>
+  <li>Campos: nombre, descripcion, precio, precio oferta, stock, categoria, destacado, activo</li>
+  <li>Subir multiples fotos (JPG/PNG/WebP, max 5MB, recomendado 800x800)</li>
+  <li>Reordenar fotos (la primera es la principal)</li>
+  <li>El slug se genera automaticamente del nombre</li>
+</ul>
+
+<h3>Categorias <span class="badge">/admin/categorias</span></h3>
+<ul>
+  <li>Crear, editar y eliminar categorias</li>
+  <li>Campos: nombre e imagen (por URL)</li>
+  <li>No se puede borrar una categoria con productos asociados</li>
+</ul>
+
+<h3>Pedidos <span class="badge">/admin/pedidos</span></h3>
+<ul>
+  <li>Lista de pedidos con datos del cliente, fecha, total y estado</li>
+  <li>Vista expandida: items, direccion de envio, metodo de pago</li>
+  <li>Cambiar estado: Pendiente, Procesando, Enviado, Entregado, Cancelado</li>
+</ul>
+
+<h3>Cupones <span class="badge">/admin/cupones</span></h3>
+<ul>
+  <li>Crear codigos de descuento (porcentaje o monto fijo)</li>
+  <li>Compra minima, usos maximos, fecha de expiracion</li>
+  <li>Activar/desactivar rapidamente desde la lista</li>
+</ul>
+
+<h3>FAQ <span class="badge">/admin/faq</span></h3>
+<ul>
+  <li>Titulo y subtitulo de la pagina</li>
+  <li>Lista de preguntas y respuestas, reordenables</li>
+</ul>
+
+<h3>Contacto <span class="badge">/admin/contacto</span></h3>
+<ul>
+  <li>Lista de telefonos, URL de Google Maps embebido, horarios de atencion</li>
+</ul>
+
+<h3>Quienes Somos <span class="badge">/admin/nosotros</span></h3>
+<ul>
+  <li>Titulo, subtitulo, descripcion larga, imagen, puntos destacados</li>
+</ul>
+
+<h3>Servicio Tecnico <span class="badge">/admin/servicio</span></h3>
+<ul>
+  <li>Hero: titulo y subtitulo</li>
+  <li>Tarjetas de servicios y beneficios con iconos</li>
+  <li>CTA WhatsApp: titulo, subtitulo, mensaje predeterminado</li>
+</ul>
+
+<h3>Configuracion General <span class="badge">/admin/configuracion</span></h3>
+<ul>
+  <li><strong>Nombre del sitio</strong> (header, footer, titulo del navegador)</li>
+  <li><strong>Logo</strong> (subir imagen)</li>
+  <li><strong>Datos de contacto:</strong> telefono, email, direccion</li>
+  <li><strong>Moneda:</strong> simbolo (ej: <code>$</code>, <code>US$</code>, <code>€</code>)</li>
+  <li><strong>Redes sociales:</strong> Instagram, Facebook, Twitter/X, TikTok</li>
+  <li><strong>Colores del tema:</strong> color primario y acento (selector de color)</li>
+  <li><strong>Descripcion del footer</strong></li>
+  <li><strong>Opciones de envio:</strong> nombre, costo y descripcion</li>
+</ul>
+
+<hr>
+
+<h2>Como personalizar la tienda para un cliente nuevo</h2>
+<ol>
+  <li><strong>Entrar al admin</strong> con <code>admin@webgenerica.com</code> / <code>admin123</code></li>
+  <li><strong>Configuracion General:</strong> cambiar nombre, logo, colores, contacto, redes, moneda</li>
+  <li><strong>Editar Inicio:</strong> armar el carrusel hero con las imagenes del negocio, ajustar beneficios</li>
+  <li><strong>Categorias:</strong> crear las categorias del negocio</li>
+  <li><strong>Productos:</strong> cargar productos con fotos, precios y descripcion</li>
+  <li><strong>Paginas informativas:</strong> editar FAQ, Contacto, Quienes Somos, Servicio Tecnico</li>
+  <li><strong>Opciones de envio:</strong> configurar en la seccion de Configuracion</li>
+  <li><strong>Cupones:</strong> crear codigos de descuento si se necesitan</li>
+</ol>
+<p>Con estos pasos, la tienda queda completamente adaptada al nuevo cliente sin tocar codigo.</p>
+
+<hr>
+
+<h2>Limitaciones actuales y soluciones a futuro</h2>
+
+<div class="limitation">
+  <strong>1. Imagenes se pierden al re-deployar el backend</strong>
+  <p>Las imagenes se guardan en disco del servidor (Render Free). Cada nuevo deploy resetea el disco.</p>
+  <p class="solution"><strong>Solucion:</strong> Migrar a Cloudinary (gratis, 25GB) o Amazon S3.</p>
+</div>
+
+<div class="limitation">
+  <strong>2. Variantes de producto limitadas</strong>
+  <p>El modelo soporta variantes (talle, color) pero el admin no permite crearlas.</p>
+  <p class="solution"><strong>Solucion:</strong> Agregar seccion de variantes al formulario de productos.</p>
+</div>
+
+<div class="limitation">
+  <strong>3. Imagenes de categorias por URL</strong>
+  <p>Las categorias requieren pegar una URL en vez de subir archivo.</p>
+  <p class="solution"><strong>Solucion:</strong> Integrar el mismo componente de upload que usan los productos.</p>
+</div>
+
+<div class="limitation">
+  <strong>4. Sin gestion de pagos real</strong>
+  <p>El checkout no procesa pagos reales, solo registra la orden.</p>
+  <p class="solution"><strong>Solucion:</strong> Integrar MercadoPago (ideal para Uruguay/Latam) o Stripe.</p>
+</div>
+
+<div class="limitation">
+  <strong>5. Sin notificaciones por email</strong>
+  <p>El servicio de email esta configurado pero no envia emails automaticos.</p>
+  <p class="solution"><strong>Solucion:</strong> Configurar SMTP y activar emails transaccionales.</p>
+</div>
+
+<div class="limitation">
+  <strong>6. Backend se duerme (Render Free)</strong>
+  <p>Se apaga tras 15 min sin uso. Primera visita tarda ~30 segundos.</p>
+  <p class="solution"><strong>Solucion:</strong> Upgrade a Render Starter ($7/mes) o usar UptimeRobot para pings.</p>
+</div>
+
+<div class="limitation">
+  <strong>7. Base de datos expira en 90 dias</strong>
+  <p>PostgreSQL en Render Free tiene limite temporal.</p>
+  <p class="solution"><strong>Solucion:</strong> Migrar a Supabase o Neon (gratis permanente) antes de que expire.</p>
+</div>
+
+<div class="limitation">
+  <strong>8. Limite de 100 productos/pedidos en listados admin</strong>
+  <p>Los listados cargan hasta 100 registros.</p>
+  <p class="solution"><strong>Solucion:</strong> Implementar paginacion en los listados del admin.</p>
+</div>
+
+<div class="limitation">
+  <strong>9. Sin sistema de roles granular</strong>
+  <p>Solo hay dos roles: admin y customer.</p>
+  <p class="solution"><strong>Solucion:</strong> Agregar tabla de roles/permisos y middleware de autorizacion.</p>
+</div>
+
+<hr>
+
+<h2>Stack tecnico</h2>
+<table>
+  <tr><th>Componente</th><th>Tecnologia</th></tr>
+  <tr><td>Frontend</td><td>React 19 + TypeScript + Vite 8 + Tailwind CSS 4</td></tr>
+  <tr><td>Backend</td><td>Node.js + Express 5 + TypeScript + Prisma 7</td></tr>
+  <tr><td>Base de datos</td><td>PostgreSQL 16</td></tr>
+  <tr><td>Hosting Frontend</td><td>Vercel (gratis)</td></tr>
+  <tr><td>Hosting Backend</td><td>Render (gratis)</td></tr>
+  <tr><td>Repositorio</td><td>GitHub</td></tr>
+</table>
+
+<hr>
+
+<h2>Flujo de deploy</h2>
+<p style="text-align:center; font-size: 16px; background: #f1f5f9; padding: 16px; border-radius: 8px; margin: 16px 0;">
+  <strong>Codigo local</strong> &rarr; git push &rarr; <strong>GitHub</strong> &rarr; Vercel (frontend) + Render (backend)
+</p>
+<p>Cada push a la rama <code>master</code> dispara deploy automatico en ambas plataformas. No hay que hacer nada manual.</p>
+
+</body>
+</html>

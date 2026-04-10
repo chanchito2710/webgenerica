@@ -29,10 +29,40 @@ const allowedOrigins = config.frontendUrl
   .map((o) => o.trim())
   .filter(Boolean);
 
+const tenantDomainCache = new Map<string, boolean>();
+const DOMAIN_CACHE_TTL = 60_000;
+let domainCacheExpiry = 0;
+
+async function refreshDomainCache() {
+  if (Date.now() < domainCacheExpiry) return;
+  try {
+    const tenants = await prisma.tenant.findMany({
+      where: { domain: { not: null }, status: 'active' },
+      select: { domain: true },
+    });
+    tenantDomainCache.clear();
+    for (const t of tenants) {
+      if (t.domain) {
+        tenantDomainCache.set(`https://${t.domain}`, true);
+        tenantDomainCache.set(`http://${t.domain}`, true);
+      }
+    }
+    domainCacheExpiry = Date.now() + DOMAIN_CACHE_TTL;
+  } catch {}
+}
+
 app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) cb(null, true);
-    else cb(null, false);
+  origin: async (origin, cb) => {
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      cb(null, true);
+      return;
+    }
+    await refreshDomainCache();
+    if (tenantDomainCache.has(origin)) {
+      cb(null, true);
+      return;
+    }
+    cb(null, false);
   },
   credentials: true,
 }));

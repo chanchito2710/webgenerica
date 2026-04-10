@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
 import { LayoutDashboard, Store, Users, ChevronLeft, Menu, X, ScrollText, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import TenantSwitcher from '../../components/TenantSwitcher';
 
 const navItems = [
   { to: '/super-admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
@@ -65,8 +66,9 @@ export default function SuperAdminLayout() {
         </div>
       )}
 
-      <aside className="w-56 bg-indigo-950 text-indigo-200 shrink-0 hidden md:block">
-        {navContent}
+      <aside className="w-56 bg-indigo-950 text-indigo-200 shrink-0 hidden md:flex md:flex-col md:justify-between">
+        <div>{navContent}</div>
+        <TenantSwitcher />
       </aside>
 
       <main className="flex-1 bg-gray-50 p-4 md:p-6 overflow-auto">
