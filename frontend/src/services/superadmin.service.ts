@@ -62,8 +62,13 @@ export const superadminService = {
     const { data } = await api.get<PaginatedAdmins>('/super-admin/admins', { params });
     return data;
   },
-  async createAdmin(body: { email: string; name: string; tenantId: number }): Promise<AdminUser> {
-    const { data } = await api.post<AdminUser>('/super-admin/admins', body);
+  async createAdmin(body: {
+    email: string;
+    name: string;
+    tenantId: number;
+    activeImmediately?: boolean;
+  }): Promise<AdminUser & { tempPassword?: string }> {
+    const { data } = await api.post<AdminUser & { tempPassword?: string }>('/super-admin/admins', body);
     return data;
   },
   async updateAdmin(id: number, body: Partial<{ name: string; email: string; tenantId: number }>): Promise<AdminUser> {

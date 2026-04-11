@@ -243,10 +243,12 @@ export async function getAdmins(req: Request, res: Response) {
 
 export async function createAdmin(req: Request, res: Response) {
   try {
-    const { email, name, tenantId } = req.body;
+    const { email, name, tenantId, activeImmediately } = req.body;
     if (!email || !name || !tenantId) {
       return res.status(400).json({ error: 'Email, nombre y tenantId son requeridos' });
     }
+
+    const immediate = Boolean(activeImmediately);
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) return res.status(409).json({ error: 'El email ya está registrado' });
@@ -265,24 +267,32 @@ export async function createAdmin(req: Request, res: Response) {
         password: hashed,
         role: 'admin',
         tenantId: Number(tenantId),
-        isActive: false,
-        activationToken,
+        isActive: immediate,
+        activationToken: immediate ? null : activationToken,
+        activatedAt: immediate ? new Date() : null,
       },
     });
 
-    const activationUrl = `${config.appUrl}/api/auth/activate/${activationToken}`;
-    void sendActivationEmail({ to: email, name, activationUrl, tempPassword });
+    if (!immediate) {
+      const activationUrl = `${config.appUrl}/api/auth/activate/${activationToken}`;
+      void sendActivationEmail({ to: email, name, activationUrl, tempPassword });
+    }
 
     await prisma.auditLog.create({
       data: {
         userId: req.user!.userId, action: 'create_admin', entity: 'User',
-        entityId: user.id, tenantId: Number(tenantId), details: { email, name },
+        entityId: user.id, tenantId: Number(tenantId), details: { email, name, activeImmediately: immediate },
       },
     });
 
     res.status(201).json({
-      id: user.id, email: user.email, name: user.name,
-      role: user.role, tenantId: user.tenantId, isActive: user.isActive,
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      tenantId: user.tenantId,
+      isActive: user.isActive,
+      ...(immediate ? { tempPassword } : {}),
     });
   } catch (err) {
     console.error(err);

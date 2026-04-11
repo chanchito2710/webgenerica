@@ -10,7 +10,7 @@ export default function SAAdmins() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [showCreate, setShowCreate] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', tenantId: '' });
+  const [form, setForm] = useState({ name: '', email: '', tenantId: '', activeImmediately: false });
 
   const fetchAdmins = () => {
     setLoading(true);
@@ -31,10 +31,22 @@ export default function SAAdmins() {
   const handleCreate = async () => {
     if (!form.name || !form.email || !form.tenantId) { toast.error('Todos los campos son requeridos'); return; }
     try {
-      await superadminService.createAdmin({ name: form.name, email: form.email, tenantId: Number(form.tenantId) });
-      toast.success('Admin creado. Email de activación enviado.');
+      const res = await superadminService.createAdmin({
+        name: form.name,
+        email: form.email,
+        tenantId: Number(form.tenantId),
+        activeImmediately: form.activeImmediately,
+      });
+      if (form.activeImmediately && res.tempPassword) {
+        toast.success('Admin creado y activado.');
+        window.alert(
+          `Guardá esta contraseña temporal (no se volverá a mostrar):\n\n${res.tempPassword}\n\nCompartila con el administrador por un canal seguro.`,
+        );
+      } else {
+        toast.success('Admin creado. Email de activación enviado (si SMTP está configurado).');
+      }
       setShowCreate(false);
-      setForm({ name: '', email: '', tenantId: '' });
+      setForm({ name: '', email: '', tenantId: '', activeImmediately: false });
       fetchAdmins();
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'Error al crear admin');
@@ -97,7 +109,11 @@ export default function SAAdmins() {
       {showCreate && (
         <div className="bg-white border rounded-xl p-5 mb-6 space-y-3">
           <h2 className="font-semibold text-gray-900">Crear administrador</h2>
-          <p className="text-xs text-gray-500">Se le enviará un email con la contraseña temporal y un enlace de activación.</p>
+          <p className="text-xs text-gray-500">
+            {form.activeImmediately
+              ? 'La cuenta quedará activa al instante. Se mostrará la contraseña temporal una sola vez (sin email).'
+              : 'Se intentará enviar un email con contraseña temporal y enlace de activación (requiere SMTP en el servidor).'}
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <input placeholder="Nombre *" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="border rounded-lg px-3 py-2 text-sm" />
             <input placeholder="Email *" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="border rounded-lg px-3 py-2 text-sm" />
@@ -106,9 +122,20 @@ export default function SAAdmins() {
               {tenants.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.slug})</option>)}
             </select>
           </div>
-          <div className="flex gap-2">
-            <button onClick={handleCreate} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">Crear y enviar email</button>
-            <button onClick={() => setShowCreate(false)} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300">Cancelar</button>
+          <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.activeImmediately}
+              onChange={(e) => setForm({ ...form, activeImmediately: e.target.checked })}
+              className="rounded border-gray-300"
+            />
+            Activar ya (sin email; mostrar contraseña temporal aquí)
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={handleCreate} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+              {form.activeImmediately ? 'Crear admin activo' : 'Crear y enviar email'}
+            </button>
+            <button type="button" onClick={() => setShowCreate(false)} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-300">Cancelar</button>
           </div>
         </div>
       )}
