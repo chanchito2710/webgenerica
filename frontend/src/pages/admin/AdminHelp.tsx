@@ -70,30 +70,48 @@ export default function AdminHelp() {
 
         <Block id="servicio" title="Editar Servicio">
           <p>
-            Editás el contenido de la página &quot;Servicio técnico&quot; que ven tus clientes: títulos, descripciones y
-            datos de contacto o información del servicio. Completá los campos y guardá para publicar los cambios.
+            Editás la página &quot;Servicio técnico&quot;: títulos, descripciones, tarjetas de servicios y beneficios, y
+            el bloque de llamada a la acción (CTA) de WhatsApp.
           </p>
+          <ul className="list-disc pl-5 space-y-1 mt-2">
+            <li><strong>Banner principal:</strong> podés subir una imagen de fondo para escritorio y otra para celular, y personalizar colores de fondo, texto, títulos y fuentes desde el panel de estilos.</li>
+            <li><strong>Tarjetas de servicios y beneficios:</strong> agregá, editá o eliminá tarjetas. Cada una permite elegir un ícono predefinido o subir uno propio, y opcionalmente agregar una imagen. Reordenalas arrastrando el ícono de las tres líneas (grip).</li>
+            <li><strong>CTA WhatsApp:</strong> personalizá título, subtítulo, mensaje predeterminado y estilos visuales (colores, fondo).</li>
+          </ul>
         </Block>
 
         <Block id="faq" title="Editar FAQ">
           <p>
-            Gestionás las preguntas frecuentes: podés agregar, editar o quitar ítems y ordenarlos. Cada entrada suele
-            tener una pregunta y una respuesta. Guardá cuando termines para que se vean en la página pública de FAQ.
+            Gestionás las preguntas frecuentes que ven tus clientes.
           </p>
+          <ul className="list-disc pl-5 space-y-1 mt-2">
+            <li><strong>Encabezado:</strong> editá título, subtítulo y personalizá el estilo del hero (colores, fuentes, imagen de fondo) desde el panel de estilos de sección.</li>
+            <li><strong>Preguntas:</strong> agregá, editá o eliminá. Cada pregunta puede tener opcionalmente una imagen que se muestra al expandir la respuesta. Reordenalas arrastrando el ícono grip.</li>
+          </ul>
         </Block>
 
         <Block id="nosotros" title="Editar Nosotros">
           <p>
-            Personalizás la sección &quot;Quiénes somos&quot;: título, texto, imagen opcional y puntos destacados. Subí
-            una imagen si querés reforzar la presentación de tu negocio y guardá los cambios.
+            Personalizás la sección &quot;Quiénes somos&quot; de tu tienda.
           </p>
+          <ul className="list-disc pl-5 space-y-1 mt-2">
+            <li><strong>Contenido:</strong> título, subtítulo y descripción de tu negocio.</li>
+            <li><strong>Imágenes:</strong> podés subir una imagen principal para escritorio y otra versión para celular.</li>
+            <li><strong>Puntos destacados:</strong> agregá frases cortas que resalten lo mejor de tu negocio. Reordenalos arrastrando el ícono grip.</li>
+            <li><strong>Estilo del encabezado:</strong> personalizá colores, fuentes e imagen de fondo del hero desde el panel de estilos.</li>
+          </ul>
         </Block>
 
         <Block id="contacto" title="Editar Contacto">
           <p>
-            Definís cómo se muestra la información de contacto en la página de contacto (textos, datos y lo que permita
-            el formulario de edición). Revisá que teléfonos y correos sean correctos antes de guardar.
+            Definís la información de contacto que ven tus clientes.
           </p>
+          <ul className="list-disc pl-5 space-y-1 mt-2">
+            <li><strong>Teléfonos:</strong> agregá los que necesites y reordenalos con drag-and-drop.</li>
+            <li><strong>Mapa y horarios:</strong> pegá la URL del iframe de Google Maps y escribí tus horarios de atención.</li>
+            <li><strong>Imágenes:</strong> subí una imagen de sección para escritorio y otra para celular.</li>
+            <li><strong>Estilo del encabezado:</strong> personalizá colores, fuentes e imagen de fondo desde el panel de estilos.</li>
+          </ul>
         </Block>
 
         <Block id="productos" title="Productos">
@@ -110,10 +128,13 @@ export default function AdminHelp() {
 
         <Block id="categorias" title="Categorías">
           <p>
-            Organizás las categorías del catálogo (nombre, imagen o enlace según lo que ofrezca el formulario). Las
-            categorías ayudan a que los clientes encuentren productos en la tienda. Guardá después de cada cambio
-            importante.
+            Organizás las categorías del catálogo. Las categorías ayudan a que los clientes encuentren productos en la tienda.
           </p>
+          <ul className="list-disc pl-5 space-y-1 mt-2">
+            <li>Cada categoría tiene un nombre y una imagen que podés <strong>subir directamente</strong> (no hace falta pegar URLs).</li>
+            <li>En la tabla de categorías vas a ver una miniatura de la imagen junto al nombre.</li>
+            <li>Podés editar o eliminar categorías existentes desde los botones de acción.</li>
+          </ul>
         </Block>
 
         <Block id="cupones" title="Cupones">
@@ -133,23 +154,39 @@ export default function AdminHelp() {
         <Block id="configuracion" title="Configuración">
           <p>
             Ajustás datos generales del sitio: nombre, teléfono, email, dirección, moneda, <strong>logo</strong>,
-            redes sociales, opciones de envío y colores del tema cuando estén disponibles. El logo suele mostrarse en el
-            encabezado; subí una imagen clara y liviana.
+            redes sociales y opciones de envío.
           </p>
+          <ul className="list-disc pl-5 space-y-1 mt-2">
+            <li><strong>Logo:</strong> se muestra en el encabezado de la tienda. Subí una imagen clara y liviana.</li>
+            <li><strong>Colores del tema:</strong> elegí un color primario y uno de acento. Se aplican automáticamente en toda la tienda (botones, enlaces, fondos, etc.).</li>
+            <li><strong>Tipografía global:</strong> seleccioná una fuente para títulos y otra para textos de cuerpo entre las fuentes populares de Google Fonts. Debajo de cada selector vas a ver una vista previa de cómo se ve la fuente elegida.</li>
+          </ul>
           <p className="mt-2">
-            Cada bloque tiene sus propios campos: completá lo necesario y guardá para aplicar los cambios en toda la
-            tienda.
+            Cada bloque tiene sus propios campos: completá lo necesario y guardá para aplicar los cambios en toda la tienda.
           </p>
         </Block>
 
         <Block id="consejos" title="Consejos útiles">
           <ul className="list-disc pl-5 space-y-1">
-            <li>Después de editar una pantalla, usá el botón Guardar (u equivalente) si aparece.</li>
+            <li>Después de editar una pantalla, usá el botón <strong>Guardar</strong> para aplicar los cambios.</li>
             <li>
               Abrí la tienda en otra pestaña del navegador para verificar cómo quedó lo que publicaste (por ejemplo, la
               página de inicio o un producto).
             </li>
-            <li>Si algo no sube, revisá el mensaje de error: a veces el archivo supera el peso máximo permitido.</li>
+            <li>Si algo no sube, revisá el mensaje de error: a veces el archivo supera el peso máximo de 5 MB.</li>
+            <li>
+              <strong>Drag-and-drop:</strong> para reordenar elementos (slides, preguntas, beneficios, teléfonos, etc.),
+              mantené presionado el ícono de las tres líneas (⠿) y arrastrá al lugar deseado.
+            </li>
+            <li>
+              <strong>Estilos de sección:</strong> muchas secciones tienen un panel donde podés personalizar colores de fondo,
+              colores de texto, fuentes e imágenes de fondo (escritorio y celular).
+            </li>
+            <li>
+              <strong>Tema global:</strong> los colores y fuentes que elegís en{' '}
+              <Link to="/admin/configuracion" className="text-primary hover:underline">Configuración</Link>{' '}
+              se aplican a toda la tienda automáticamente. Los estilos por sección tienen prioridad sobre el tema global.
+            </li>
             <li>
               Volvé a esta ayuda cuando quieras: menú lateral →{' '}
               <Link to="/admin/ayuda" className="text-primary hover:underline">
