@@ -3,12 +3,8 @@ import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react';
 import { useSiteConfig } from '../context/SiteConfigContext';
 import SEO from '../components/SEO';
 import toast from 'react-hot-toast';
-
-interface ContactPageConfig {
-  phones?: string[];
-  mapsEmbed?: string;
-  hours?: string;
-}
+import { sectionBgStyle, sectionHeadingStyle } from '../utils/sectionStyle';
+import type { ContactPageConfig } from '../types';
 
 export default function Contact() {
   const { config } = useSiteConfig();
@@ -29,11 +25,24 @@ export default function Contact() {
     toast.success('Abriendo cliente de correo...');
   };
 
+  const heroStyles = contactPage.heroStyles;
+  const heroStyle = sectionBgStyle(heroStyles);
+  const headingStyle = sectionHeadingStyle(heroStyles);
+
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
+    <div>
       <SEO title="Contacto" />
-      <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">Contacto</h1>
-      <p className="text-gray-500 text-center mb-10">¿Tenés alguna consulta? Estamos para ayudarte</p>
+      {heroStyle ? (
+        <section className="bg-gradient-to-r from-primary to-primary-dark text-white bg-cover bg-center" style={heroStyle}>
+          <div className="max-w-7xl mx-auto px-4 py-16 md:py-20 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold mb-3" style={headingStyle}>Contacto</h1>
+            <p className="text-lg max-w-2xl mx-auto opacity-90">¿Tenés alguna consulta? Estamos para ayudarte</p>
+          </div>
+        </section>
+      ) : null}
+      <div className="max-w-6xl mx-auto px-4 py-12">
+      {!heroStyle && <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">Contacto</h1>}
+      {!heroStyle && <p className="text-gray-500 text-center mb-10">¿Tenés alguna consulta? Estamos para ayudarte</p>}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
@@ -120,6 +129,7 @@ export default function Contact() {
             <Send size={18} /> Enviar mensaje
           </button>
         </form>
+      </div>
       </div>
     </div>
   );

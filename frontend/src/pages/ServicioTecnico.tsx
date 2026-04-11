@@ -4,7 +4,9 @@ import {
   Battery, Camera, Headphones, Zap, Star, Heart, Truck, type LucideIcon,
 } from 'lucide-react';
 import { useSiteConfig } from '../context/SiteConfigContext';
+import { assetUrl } from '../services/api';
 import SEO from '../components/SEO';
+import { sectionBgStyle, sectionHeadingStyle } from '../utils/sectionStyle';
 import type { ServicePageConfig } from '../types';
 
 const iconMap: Record<string, LucideIcon> = {
@@ -62,10 +64,13 @@ export default function ServicioTecnico() {
     <div>
       <SEO title="Servicio Técnico" />
       {/* Hero */}
-      <section className="bg-gradient-to-r from-primary to-primary-dark text-white">
+      <section
+        className="bg-gradient-to-r from-primary to-primary-dark text-white bg-cover bg-center"
+        style={sectionBgStyle(st.heroStyles)}
+      >
         <div className="max-w-7xl mx-auto px-4 py-16 md:py-24 text-center">
           <Wrench size={48} className="mx-auto mb-4 opacity-80" />
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">{st.heroTitle}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4" style={sectionHeadingStyle(st.heroStyles)}>{st.heroTitle}</h1>
           <p className="text-lg text-blue-100 max-w-2xl mx-auto">{st.heroSubtitle}</p>
         </div>
       </section>
@@ -89,9 +94,15 @@ export default function ServicioTecnico() {
               const Icon = iconMap[s.icon] || Wrench;
               return (
                 <div key={i} className="bg-white border rounded-xl p-6 text-center hover:shadow-md transition-shadow">
-                  <div className="bg-primary/10 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
-                    <Icon size={28} className="text-primary" />
-                  </div>
+                  {s.image ? (
+                    <img src={assetUrl(s.image)} alt={s.title} className="w-16 h-16 mx-auto rounded-full object-cover mb-4" />
+                  ) : s.icon === 'custom' && s.customIcon ? (
+                    <img src={assetUrl(s.customIcon)} alt={s.title} className="w-16 h-16 mx-auto rounded-full object-contain mb-4" />
+                  ) : (
+                    <div className="bg-primary/10 w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4">
+                      <Icon size={28} className="text-primary" />
+                    </div>
+                  )}
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">{s.title}</h3>
                   <p className="text-sm text-gray-500">{s.desc}</p>
                 </div>
@@ -128,7 +139,7 @@ export default function ServicioTecnico() {
 
       {/* CTA WhatsApp */}
       <section className="max-w-3xl mx-auto px-4 py-16 text-center">
-        <div className="bg-green-50 border border-green-200 rounded-xl p-8">
+        <div className="bg-green-50 border border-green-200 rounded-xl p-8" style={sectionBgStyle(st.ctaStyles)}>
           <MessageCircle size={40} className="text-green-600 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-800 mb-2">{st.ctaTitle}</h2>
           <p className="text-gray-600 mb-6">{st.ctaSubtitle}</p>

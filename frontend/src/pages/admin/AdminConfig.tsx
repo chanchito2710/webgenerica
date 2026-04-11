@@ -7,6 +7,7 @@ import type { SiteConfig, ShippingOption } from '../../types';
 import { Plus, Trash2, Truck, Upload, Palette, Share2, Image } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadHints } from '../../constants/upload';
+import { FONT_OPTIONS, loadGoogleFont } from '../../utils/fonts';
 
 function generateId() {
   return `ship_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
@@ -272,6 +273,54 @@ export default function AdminConfig() {
                   onChange={(e) => updateThemeColor('accentColor', e.target.value)}
                   placeholder="#8b5cf6"
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Fuentes globales */}
+          <div className="border-t pt-4 mt-4 space-y-4">
+            <h3 className="text-base font-medium text-gray-700">Tipografía</h3>
+            <p className="text-sm text-gray-500">Elegí las fuentes para títulos y cuerpo de texto de toda la tienda.</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm text-gray-600 mb-1 block">Fuente de títulos</label>
+                <select
+                  className={inputClass}
+                  value={normalizeRecord(form.theme).headingFont || ''}
+                  onChange={(e) => {
+                    updateThemeColor('headingFont', e.target.value);
+                    if (e.target.value) loadGoogleFont(e.target.value);
+                  }}
+                >
+                  {FONT_OPTIONS.map((f) => (
+                    <option key={f.value} value={f.value}>{f.label}</option>
+                  ))}
+                </select>
+                {normalizeRecord(form.theme).headingFont && (
+                  <p className="mt-2 text-lg text-gray-700" style={{ fontFamily: `"${normalizeRecord(form.theme).headingFont}", sans-serif` }}>
+                    Vista previa de título
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="text-sm text-gray-600 mb-1 block">Fuente de cuerpo</label>
+                <select
+                  className={inputClass}
+                  value={normalizeRecord(form.theme).bodyFont || ''}
+                  onChange={(e) => {
+                    updateThemeColor('bodyFont', e.target.value);
+                    if (e.target.value) loadGoogleFont(e.target.value);
+                  }}
+                >
+                  {FONT_OPTIONS.map((f) => (
+                    <option key={f.value} value={f.value}>{f.label}</option>
+                  ))}
+                </select>
+                {normalizeRecord(form.theme).bodyFont && (
+                  <p className="mt-2 text-sm text-gray-700" style={{ fontFamily: `"${normalizeRecord(form.theme).bodyFont}", sans-serif` }}>
+                    Vista previa del texto de cuerpo. Así se vería en párrafos y descripciones.
+                  </p>
+                )}
               </div>
             </div>
           </div>

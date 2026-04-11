@@ -5,8 +5,13 @@
   --color-primary-dark: #1e40af;
   --color-accent: #f59e0b;
   --color-accent-dark: #d97706;
+  --font-heading: system-ui, sans-serif;
+  --font-body: system-ui, sans-serif;
   --animate-fade-in: fade-in 0.6s ease-out;
 }
+
+body { font-family: var(--font-body); }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); }
 
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(12px); }

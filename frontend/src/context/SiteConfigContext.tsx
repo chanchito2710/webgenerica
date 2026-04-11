@@ -1,6 +1,32 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { configService } from '../services/config.service';
+import { darken } from '../utils/color';
+import { loadGoogleFont } from '../utils/fonts';
 import type { SiteConfig } from '../types';
+
+function applyThemeToDOM(theme: Record<string, string>) {
+  const root = document.documentElement.style;
+  if (theme.primaryColor) {
+    root.setProperty('--color-primary', theme.primaryColor);
+    root.setProperty('--color-primary-dark', darken(theme.primaryColor, 15));
+  }
+  if (theme.accentColor) {
+    root.setProperty('--color-accent', theme.accentColor);
+    root.setProperty('--color-accent-dark', darken(theme.accentColor, 15));
+  }
+  if (theme.headingFont) {
+    loadGoogleFont(theme.headingFont);
+    root.setProperty('--font-heading', `"${theme.headingFont}", system-ui, sans-serif`);
+  } else {
+    root.setProperty('--font-heading', 'system-ui, sans-serif');
+  }
+  if (theme.bodyFont) {
+    loadGoogleFont(theme.bodyFont);
+    root.setProperty('--font-body', `"${theme.bodyFont}", system-ui, sans-serif`);
+  } else {
+    root.setProperty('--font-body', 'system-ui, sans-serif');
+  }
+}
 
 interface SiteConfigContextType {
   config: SiteConfig | null;
@@ -82,8 +108,10 @@ export function SiteConfigProvider({ children }: { children: ReactNode }) {
     try {
       const data = await configService.getSiteConfig();
       setConfig(data);
+      applyThemeToDOM(data.theme || {});
     } catch {
       setConfig(defaultConfig);
+      applyThemeToDOM(defaultConfig.theme);
     } finally {
       setLoading(false);
     }

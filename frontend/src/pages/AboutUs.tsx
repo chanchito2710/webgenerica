@@ -1,14 +1,8 @@
 import { useSiteConfig } from '../context/SiteConfigContext';
 import { assetUrl } from '../services/api';
 import SEO from '../components/SEO';
-
-interface AboutPageConfig {
-  title?: string;
-  subtitle?: string;
-  description?: string;
-  image?: string;
-  highlights?: string[];
-}
+import { sectionBgStyle, sectionHeadingStyle } from '../utils/sectionStyle';
+import type { AboutPageConfig } from '../types';
 
 export default function AboutUs() {
   const { config } = useSiteConfig();
@@ -23,11 +17,23 @@ export default function AboutUs() {
     'Servicio técnico especializado',
   ];
 
+  const heroStyle = sectionBgStyle(about.heroStyles);
+  const headingStyle = sectionHeadingStyle(about.heroStyles);
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
+    <div>
       <SEO title="Quiénes Somos" />
-      <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">{title}</h1>
-      {about.subtitle && <p className="text-gray-500 text-center mb-8">{about.subtitle}</p>}
+      {heroStyle ? (
+        <section className="bg-gradient-to-r from-primary to-primary-dark text-white bg-cover bg-center" style={heroStyle}>
+          <div className="max-w-7xl mx-auto px-4 py-16 md:py-20 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold mb-3" style={headingStyle}>{title}</h1>
+            {about.subtitle && <p className="text-lg max-w-2xl mx-auto opacity-90">{about.subtitle}</p>}
+          </div>
+        </section>
+      ) : null}
+      <div className="max-w-4xl mx-auto px-4 py-12">
+      {!heroStyle && <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">{title}</h1>}
+      {!heroStyle && about.subtitle && <p className="text-gray-500 text-center mb-8">{about.subtitle}</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mt-8">
         <div>
@@ -51,6 +57,7 @@ export default function AboutUs() {
             ))}
           </ul>
         </div>
+      </div>
       </div>
     </div>
   );

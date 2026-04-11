@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { categoryService } from '../../services/category.service';
+import { assetUrl } from '../../services/api';
 import type { Category } from '../../types';
 import toast from 'react-hot-toast';
+import ImageUploadZone from '../../components/admin/ImageUploadZone';
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -64,21 +66,23 @@ export default function AdminCategories() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white border rounded-lg p-6 mb-6 flex gap-4 items-end">
-          <div className="flex-1">
+        <form onSubmit={handleSubmit} className="bg-white border rounded-lg p-6 mb-6 space-y-4">
+          <div>
             <label className="text-sm text-gray-600 mb-1 block">Nombre</label>
             <input className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           </div>
-          <div className="flex-1">
-            <label className="text-sm text-gray-600 mb-1 block">URL Imagen</label>
-            <input className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary" value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
+          <div>
+            <label className="text-sm text-gray-600 mb-1 block">Imagen</label>
+            <ImageUploadZone value={form.image} onChange={(url) => setForm({ ...form, image: url })} hint="400 × 400 px · JPG/PNG/WebP" previewClass="h-24" />
           </div>
-          <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors">
-            {editing ? 'Actualizar' : 'Crear'}
-          </button>
-          <button type="button" onClick={resetForm} className="border px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
-            Cancelar
-          </button>
+          <div className="flex gap-3">
+            <button type="submit" className="bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors">
+              {editing ? 'Actualizar' : 'Crear'}
+            </button>
+            <button type="button" onClick={resetForm} className="border px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+              Cancelar
+            </button>
+          </div>
         </form>
       )}
 
@@ -98,7 +102,10 @@ export default function AdminCategories() {
             <tbody className="divide-y">
               {categories.map((c) => (
                 <tr key={c.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-800">{c.name}</td>
+                  <td className="px-4 py-3 font-medium text-gray-800 flex items-center gap-2">
+                    {c.image && <img src={assetUrl(c.image)} alt="" className="w-8 h-8 rounded object-cover border shrink-0" />}
+                    {c.name}
+                  </td>
                   <td className="px-4 py-3 text-gray-500">{c.slug}</td>
                   <td className="px-4 py-3 text-right">{c._count?.products || 0}</td>
                   <td className="px-4 py-3 text-right">

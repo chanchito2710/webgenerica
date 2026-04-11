@@ -72,15 +72,30 @@ export interface ShippingOption {
   cost: number;
 }
 
+export interface SectionStyles {
+  bgColor?: string;
+  bgImage?: string;
+  mobileBgImage?: string;
+  textColor?: string;
+  headingFont?: string;
+  bodyFont?: string;
+  headingColor?: string;
+}
+
 export interface ServiceCard {
   icon: string;
+  customIcon?: string;
   title: string;
   desc: string;
+  image?: string;
 }
 
 export interface ServicePageConfig {
   heroTitle: string;
   heroSubtitle: string;
+  heroImage?: string;
+  heroMobileImage?: string;
+  heroStyles?: SectionStyles;
   descTitle: string;
   descBody: string;
   servicesTitle: string;
@@ -90,17 +105,20 @@ export interface ServicePageConfig {
   ctaTitle: string;
   ctaSubtitle: string;
   ctaWhatsappMessage: string;
+  ctaStyles?: SectionStyles;
 }
 
 export interface FaqItem {
   question: string;
   answer: string;
+  image?: string;
 }
 
 export interface FaqPageConfig {
   title: string;
   subtitle: string;
   items: FaqItem[];
+  heroStyles?: SectionStyles;
 }
 
 export interface AboutPageConfig {
@@ -108,13 +126,18 @@ export interface AboutPageConfig {
   subtitle?: string;
   description?: string;
   image?: string;
+  mobileImage?: string;
   highlights?: string[];
+  heroStyles?: SectionStyles;
 }
 
 export interface ContactPageConfig {
   phones?: string[];
   mapsEmbed?: string;
   hours?: string;
+  image?: string;
+  mobileImage?: string;
+  heroStyles?: SectionStyles;
 }
 
 export interface InstagramSection {
