@@ -28,9 +28,15 @@ export const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
-    const allowed = /jpeg|jpg|png|gif|webp/;
-    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
-    const mime = allowed.test(file.mimetype);
-    cb(null, ext && mime);
+    const ext = path.extname(file.originalname).toLowerCase();
+    const extOk = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'].includes(ext);
+    const mimeOk = [
+      'image/jpeg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'image/svg+xml',
+    ].includes(file.mimetype);
+    cb(null, extOk && mimeOk);
   },
 });

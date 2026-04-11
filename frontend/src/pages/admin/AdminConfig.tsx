@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { configService } from '../../services/config.service';
-import { uploadService } from '../../services/upload.service';
+import { assertFileSizeWithinUploadLimit, uploadService } from '../../services/upload.service';
 import { assetUrl } from '../../services/api';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import type { SiteConfig, ShippingOption } from '../../types';
 import { Plus, Trash2, Truck, Upload, Palette, Share2, Image } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { uploadHints } from '../../constants/upload';
 
 function generateId() {
   return `ship_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
@@ -38,13 +39,19 @@ export default function AdminConfig() {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
+    try {
+      assertFileSizeWithinUploadLimit(file);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir el logo');
+      return;
+    }
     setUploadingLogo(true);
     try {
       const result = await uploadService.uploadImage(file);
       setForm((prev) => ({ ...prev, logo: result.url }));
       toast.success('Logo subido');
-    } catch {
-      toast.error('Error al subir el logo');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir el logo');
     } finally {
       setUploadingLogo(false);
     }
@@ -129,6 +136,7 @@ export default function AdminConfig() {
             <Image size={20} /> Logo del sitio
           </h2>
           <p className="text-sm text-gray-500">Imagen que se muestra en el encabezado y enlaces al sitio.</p>
+          <p className="text-xs text-gray-500">{uploadHints.siteLogo}</p>
           {form.logo ? (
             <div className="flex flex-col sm:flex-row sm:items-start gap-4">
               <div className="relative group shrink-0">
@@ -143,7 +151,7 @@ export default function AdminConfig() {
                   <input
                     ref={logoInputRef}
                     type="file"
-                    accept="image/jpeg,image/png,image/webp"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     className="hidden"
                     disabled={uploadingLogo}
                     onChange={handleLogoUpload}
@@ -163,11 +171,10 @@ export default function AdminConfig() {
             <label className="flex flex-col items-center justify-center min-h-[120px] border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
               <Upload size={24} className="text-gray-400 mb-1" />
               <span className="text-sm text-gray-500">{uploadingLogo ? 'Subiendo…' : 'Subir logo'}</span>
-              <span className="text-xs text-gray-400 mt-0.5">JPG, PNG o WebP</span>
               <input
                 ref={logoInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept="image/jpeg,image/png,image/webp,image/gif"
                 className="hidden"
                 disabled={uploadingLogo}
                 onChange={handleLogoUpload}

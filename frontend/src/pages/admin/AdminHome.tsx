@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Upload, Plus, Trash2, Image, GripVertical, Link as LinkIcon, MousePointerClick, Paintbrush, ChevronDown, ChevronUp, LayoutGrid, Type, ShoppingBag, Megaphone } from 'lucide-react';
 import { InstagramIcon } from '../../components/SocialIcons';
 import { configService } from '../../services/config.service';
-import { uploadService } from '../../services/upload.service';
+import { assertFileSizeWithinUploadLimit, uploadService } from '../../services/upload.service';
 import { productService } from '../../services/product.service';
 import { assetUrl } from '../../services/api';
 import { useSiteConfig } from '../../context/SiteConfigContext';
@@ -10,6 +10,7 @@ import { useDragReorder } from '../../hooks/useDragReorder';
 import { FONT_OPTIONS, loadGoogleFont } from '../../utils/fonts';
 import type { HeroSlide, HeroButton, SlideStyles, SlideLayout, SlideCustomText, Benefit, Product, InstagramSection, PromoBanner } from '../../types';
 import toast from 'react-hot-toast';
+import { uploadHints } from '../../constants/upload';
 
 const ICON_OPTIONS = [
   { value: 'truck', label: 'Camión (envíos)' },
@@ -518,6 +519,12 @@ export default function AdminHome() {
   const handleSlideImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    try {
+      assertFileSizeWithinUploadLimit(file);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
+      return;
+    }
     setUploadingSlideIdx(index);
     try {
       const result = await uploadService.uploadImage(file);
@@ -525,8 +532,8 @@ export default function AdminHome() {
       updated[index] = { ...updated[index], imageUrl: result.url };
       setSlides(updated);
       toast.success('Imagen subida');
-    } catch {
-      toast.error('Error al subir imagen');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
     } finally {
       setUploadingSlideIdx(null);
     }
@@ -564,6 +571,12 @@ export default function AdminHome() {
   const handleMobileImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    try {
+      assertFileSizeWithinUploadLimit(file);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
+      return;
+    }
     setUploadingSlideIdx(index);
     try {
       const result = await uploadService.uploadImage(file);
@@ -571,8 +584,8 @@ export default function AdminHome() {
       updated[index] = { ...updated[index], mobileImageUrl: result.url };
       setSlides(updated);
       toast.success('Imagen celular subida');
-    } catch {
-      toast.error('Error al subir imagen');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
     } finally {
       setUploadingSlideIdx(null);
     }
@@ -581,6 +594,12 @@ export default function AdminHome() {
   const handleBgImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    try {
+      assertFileSizeWithinUploadLimit(file);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
+      return;
+    }
     setUploadingSlideIdx(index);
     try {
       const result = await uploadService.uploadImage(file);
@@ -588,8 +607,8 @@ export default function AdminHome() {
       updated[index] = { ...updated[index], backgroundUrl: result.url };
       setSlides(updated);
       toast.success('Imagen de fondo subida');
-    } catch {
-      toast.error('Error al subir imagen');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
     } finally {
       setUploadingSlideIdx(null);
     }
@@ -598,6 +617,12 @@ export default function AdminHome() {
   const handleMobileBgImageUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    try {
+      assertFileSizeWithinUploadLimit(file);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
+      return;
+    }
     setUploadingSlideIdx(index);
     try {
       const result = await uploadService.uploadImage(file);
@@ -605,8 +630,8 @@ export default function AdminHome() {
       updated[index] = { ...updated[index], mobileBackgroundUrl: result.url };
       setSlides(updated);
       toast.success('Imagen de fondo celular subida');
-    } catch {
-      toast.error('Error al subir imagen');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
     } finally {
       setUploadingSlideIdx(null);
     }
@@ -656,6 +681,12 @@ export default function AdminHome() {
   const handleIconUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    try {
+      assertFileSizeWithinUploadLimit(file);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir ícono');
+      return;
+    }
     setUploadingIconIdx(index);
     try {
       const result = await uploadService.uploadImage(file);
@@ -663,8 +694,8 @@ export default function AdminHome() {
       updated[index] = { ...updated[index], icon: 'custom', customIcon: result.url };
       setBenefits(updated);
       toast.success('Ícono subido');
-    } catch {
-      toast.error('Error al subir ícono');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir ícono');
     } finally {
       setUploadingIconIdx(null);
     }
@@ -695,13 +726,19 @@ export default function AdminHome() {
   const handlePromoImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    try {
+      assertFileSizeWithinUploadLimit(file);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
+      return;
+    }
     setUploadingPromo(true);
     try {
       const result = await uploadService.uploadImage(file);
       setPromoBannerState((p) => ({ ...p, imageUrl: result.url }));
       toast.success('Imagen subida');
-    } catch {
-      toast.error('Error al subir imagen');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
     } finally {
       setUploadingPromo(false);
     }
@@ -787,9 +824,9 @@ export default function AdminHome() {
             </button>
           </div>
         </div>
-        <p className="text-sm text-gray-500 mb-1">
-          Agregá múltiples banners que rotan automáticamente. Tamaño sugerido: <strong>1920 x 600 px</strong> (JPG, PNG, WebP).
-        </p>
+        <p className="text-sm text-gray-500 mb-1">Agregá múltiples banners que rotan automáticamente.</p>
+        <p className="text-xs text-gray-500 mb-1">Escritorio: {uploadHints.heroDesktop}</p>
+        <p className="text-xs text-gray-500 mb-1">Celular (opcional): {uploadHints.heroMobile}</p>
         <p className="text-xs text-gray-400 mb-4 flex items-center gap-1">
           <GripVertical size={12} /> Arrastrá el ícono <strong>⠿</strong> para reordenar slides y botones.
         </p>
@@ -898,13 +935,14 @@ export default function AdminHome() {
                           {/* Background image (desktop) */}
                           <div>
                             <label className="text-xs text-gray-500 mb-1.5 block">Fondo escritorio <span className="text-gray-400">(opcional)</span></label>
+                            <p className="text-[10px] text-gray-400 mb-1">{uploadHints.heroDesktop}</p>
                             {slide.backgroundUrl ? (
                               <div className="relative group">
                                 <img src={assetUrl(slide.backgroundUrl || '')} alt="Fondo" className="w-full h-24 object-cover rounded-lg border" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-3">
                                   <label className="bg-white text-gray-800 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer hover:bg-gray-100">
                                     Cambiar
-                                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => handleBgImageUpload(i, e)} className="hidden" />
+                                    <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => handleBgImageUpload(i, e)} className="hidden" />
                                   </label>
                                   <button onClick={() => updateSlideField(i, 'backgroundUrl', '')} className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600">
                                     Quitar
@@ -915,8 +953,7 @@ export default function AdminHome() {
                               <label className="flex flex-col items-center justify-center h-20 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
                                 <Upload size={20} className="text-gray-400 mb-1" />
                                 <span className="text-[11px] text-gray-500">{uploadingSlideIdx === i ? 'Subiendo...' : 'Subir fondo'}</span>
-                                <span className="text-[10px] text-gray-400 mt-0.5">1920 x 600 px · JPG/PNG/WebP</span>
-                                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => handleBgImageUpload(i, e)} className="hidden" disabled={uploadingSlideIdx === i} />
+                                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => handleBgImageUpload(i, e)} className="hidden" disabled={uploadingSlideIdx === i} />
                               </label>
                             )}
                           </div>
@@ -924,13 +961,14 @@ export default function AdminHome() {
                           {/* Background image (mobile) */}
                           <div>
                             <label className="text-xs text-gray-500 mb-1.5 block">Fondo celular <span className="text-gray-400">(opcional)</span></label>
+                            <p className="text-[10px] text-gray-400 mb-1">{uploadHints.heroMobile}</p>
                             {slide.mobileBackgroundUrl ? (
                               <div className="relative group">
                                 <img src={assetUrl(slide.mobileBackgroundUrl || '')} alt="Fondo celular" className="w-full h-24 object-cover rounded-lg border" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-3">
                                   <label className="bg-white text-gray-800 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer hover:bg-gray-100">
                                     Cambiar
-                                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => handleMobileBgImageUpload(i, e)} className="hidden" />
+                                    <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => handleMobileBgImageUpload(i, e)} className="hidden" />
                                   </label>
                                   <button onClick={() => updateSlideField(i, 'mobileBackgroundUrl', '')} className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600">
                                     Quitar
@@ -941,8 +979,7 @@ export default function AdminHome() {
                               <label className="flex flex-col items-center justify-center h-16 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
                                 <Upload size={16} className="text-gray-400 mb-0.5" />
                                 <span className="text-[11px] text-gray-500">{uploadingSlideIdx === i ? 'Subiendo...' : 'Subir fondo celular'}</span>
-                                <span className="text-[10px] text-gray-400">750 x 1000 px · Vertical</span>
-                                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => handleMobileBgImageUpload(i, e)} className="hidden" disabled={uploadingSlideIdx === i} />
+                                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => handleMobileBgImageUpload(i, e)} className="hidden" disabled={uploadingSlideIdx === i} />
                               </label>
                             )}
                           </div>
@@ -952,13 +989,14 @@ export default function AdminHome() {
                           {/* Desktop image */}
                           <div>
                             <label className="text-xs text-gray-500 mb-1.5 block">Imagen escritorio</label>
+                            <p className="text-[10px] text-gray-400 mb-1">{uploadHints.heroDesktop}</p>
                             {slide.imageUrl ? (
                               <div className="relative group">
                                 <img src={assetUrl(slide.imageUrl)} alt={`Slide ${i + 1}`} className="w-full h-28 sm:h-36 object-cover rounded-lg border" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-3">
                                   <label className="bg-white text-gray-800 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer hover:bg-gray-100">
                                     Cambiar
-                                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => handleSlideImageUpload(i, e)} className="hidden" />
+                                    <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => handleSlideImageUpload(i, e)} className="hidden" />
                                   </label>
                                   <button onClick={() => updateSlideField(i, 'imageUrl', '')} className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600">
                                     Quitar
@@ -969,8 +1007,7 @@ export default function AdminHome() {
                               <label className="flex flex-col items-center justify-center h-28 sm:h-36 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
                                 <Upload size={24} className="text-gray-400 mb-1" />
                                 <span className="text-xs text-gray-500">{uploadingSlideIdx === i ? 'Subiendo...' : 'Subir imagen'}</span>
-                                <span className="text-[10px] text-gray-400 mt-0.5">1920 x 600 px · JPG/PNG/WebP</span>
-                                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => handleSlideImageUpload(i, e)} className="hidden" disabled={uploadingSlideIdx === i} />
+                                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => handleSlideImageUpload(i, e)} className="hidden" disabled={uploadingSlideIdx === i} />
                               </label>
                             )}
                           </div>
@@ -978,13 +1015,14 @@ export default function AdminHome() {
                           {/* Mobile image */}
                           <div>
                             <label className="text-xs text-gray-500 mb-1.5 block">Imagen celular <span className="text-gray-400">(opcional)</span></label>
+                            <p className="text-[10px] text-gray-400 mb-1">{uploadHints.heroMobile}</p>
                             {slide.mobileImageUrl ? (
                               <div className="relative group">
                                 <img src={assetUrl(slide.mobileImageUrl || '')} alt={`Slide ${i + 1} mobile`} className="w-full h-28 sm:h-36 object-cover rounded-lg border" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-3">
                                   <label className="bg-white text-gray-800 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer hover:bg-gray-100">
                                     Cambiar
-                                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => handleMobileImageUpload(i, e)} className="hidden" />
+                                    <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => handleMobileImageUpload(i, e)} className="hidden" />
                                   </label>
                                   <button onClick={() => updateSlideField(i, 'mobileImageUrl', '')} className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-red-600">
                                     Quitar
@@ -995,8 +1033,7 @@ export default function AdminHome() {
                               <label className="flex flex-col items-center justify-center h-20 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
                                 <Upload size={20} className="text-gray-400 mb-1" />
                                 <span className="text-[11px] text-gray-500">{uploadingSlideIdx === i ? 'Subiendo...' : 'Subir imagen celular'}</span>
-                                <span className="text-[10px] text-gray-400 mt-0.5">750 x 1000 px · Vertical · JPG/PNG/WebP</span>
-                                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => handleMobileImageUpload(i, e)} className="hidden" disabled={uploadingSlideIdx === i} />
+                                <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(e) => handleMobileImageUpload(i, e)} className="hidden" disabled={uploadingSlideIdx === i} />
                               </label>
                             )}
                           </div>
@@ -1102,7 +1139,7 @@ export default function AdminHome() {
                         <Upload size={12} /> Subir ícono propio
                       </button>
                     )}
-                    <p className="text-[10px] text-gray-400 mt-1">64 x 64 px, PNG/SVG/WebP</p>
+                    <p className="text-[10px] text-gray-400 mt-1">{uploadHints.benefitIcon}</p>
                   </div>
 
                   <div className="flex-1 space-y-3">
@@ -1200,13 +1237,14 @@ export default function AdminHome() {
             <p className="text-sm text-gray-500">Banner destacado en inicio (imagen de fondo, textos y enlace).</p>
             <div>
               <label className="text-xs text-gray-500 mb-1.5 block">Imagen</label>
+              <p className="text-[10px] text-gray-400 mb-1">{uploadHints.promoBanner}</p>
               {promoBannerState.imageUrl ? (
                 <div className="relative group">
                   <img src={assetUrl(promoBannerState.imageUrl || '')} alt={promoBannerState.title || 'Banner'} className="w-full max-h-48 object-cover rounded-lg border" />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-3">
                     <label className="bg-white text-gray-800 px-3 py-1.5 rounded-lg text-sm font-medium cursor-pointer hover:bg-gray-100">
                       Cambiar
-                      <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePromoImageUpload} className="hidden" disabled={uploadingPromo} />
+                      <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handlePromoImageUpload} className="hidden" disabled={uploadingPromo} />
                     </label>
                     <button
                       type="button"
@@ -1221,7 +1259,7 @@ export default function AdminHome() {
                 <label className="flex flex-col items-center justify-center h-28 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
                   <Upload size={24} className="text-gray-400 mb-1" />
                   <span className="text-xs text-gray-500">{uploadingPromo ? 'Subiendo…' : 'Subir imagen'}</span>
-                  <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePromoImageUpload} className="hidden" disabled={uploadingPromo} />
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handlePromoImageUpload} className="hidden" disabled={uploadingPromo} />
                 </label>
               )}
             </div>

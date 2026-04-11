@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { configService } from '../../services/config.service';
-import { uploadService } from '../../services/upload.service';
+import { assertFileSizeWithinUploadLimit, uploadService } from '../../services/upload.service';
 import { assetUrl } from '../../services/api';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import { Upload, Plus, Trash2, Image } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { uploadHints } from '../../constants/upload';
 
 interface AboutPage {
   title: string;
@@ -49,12 +50,18 @@ export default function AdminAbout() {
   const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    try {
+      assertFileSizeWithinUploadLimit(file);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
+      return;
+    }
     setUploading(true);
     try {
       const result = await uploadService.uploadImage(file);
       setForm({ ...form, image: result.url });
-    } catch {
-      toast.error('Error al subir imagen');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al subir imagen');
     } finally {
       setUploading(false);
     }
@@ -85,6 +92,7 @@ export default function AdminAbout() {
 
           <div>
             <label className="text-sm text-gray-600 mb-2 block">Imagen</label>
+            <p className="text-xs text-gray-500 mb-2">{uploadHints.aboutImage}</p>
             {form.image ? (
               <div className="relative group inline-block">
                 <img src={assetUrl(form.image)} alt="" className="w-full max-w-xs rounded-lg border" />
@@ -96,7 +104,13 @@ export default function AdminAbout() {
               <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-primary transition-colors max-w-xs">
                 <Upload size={24} className="text-gray-400 mb-2" />
                 <span className="text-sm text-gray-500">{uploading ? 'Subiendo...' : 'Subir imagen'}</span>
-                <input type="file" accept="image/*" onChange={handleImage} className="hidden" disabled={uploading} />
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  onChange={handleImage}
+                  className="hidden"
+                  disabled={uploading}
+                />
               </label>
             )}
           </div>

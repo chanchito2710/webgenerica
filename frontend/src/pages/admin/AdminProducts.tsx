@@ -2,11 +2,12 @@ import { useEffect, useState, useRef } from 'react';
 import { Plus, Pencil, Trash2, Upload, X, ChevronLeft, ChevronRight, ImageIcon, Star, ShoppingCart } from 'lucide-react';
 import { productService } from '../../services/product.service';
 import { categoryService } from '../../services/category.service';
-import { uploadService } from '../../services/upload.service';
+import { assertFileSizeWithinUploadLimit, uploadService } from '../../services/upload.service';
 import { assetUrl } from '../../services/api';
 import { useSiteConfig } from '../../context/SiteConfigContext';
 import type { Product, Category } from '../../types';
 import toast from 'react-hot-toast';
+import { uploadHints } from '../../constants/upload';
 
 interface FormImage {
   url: string;
@@ -61,14 +62,24 @@ export default function AdminProducts() {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+    const list = Array.from(files);
+    for (const file of list) {
+      try {
+        assertFileSizeWithinUploadLimit(file);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : `Error con ${file.name}`);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        return;
+      }
+    }
     setUploading(true);
     const newImages: FormImage[] = [];
-    for (const file of Array.from(files)) {
+    for (const file of list) {
       try {
         const result = await uploadService.uploadImage(file);
         newImages.push({ url: result.url });
-      } catch {
-        toast.error(`Error al subir ${file.name}`);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : `Error al subir ${file.name}`);
       }
     }
     if (newImages.length > 0) {
@@ -158,9 +169,7 @@ export default function AdminProducts() {
           {/* Image upload zone */}
           <div className="sm:col-span-2">
             <label className="text-sm text-gray-600 mb-1 block">Fotos del producto</label>
-            <p className="text-xs text-gray-400 mb-3">
-              Formato: JPG, PNG o WebP · Tamaño sugerido: <strong>800 x 800 px</strong> (cuadrado) · Peso máx: 5 MB · La primera imagen será la principal.
-            </p>
+            <p className="text-xs text-gray-400 mb-3">{uploadHints.productPhotos}</p>
 
             {form.images.length > 0 && (
               <div className="flex flex-wrap gap-3 mb-3">
@@ -211,7 +220,7 @@ export default function AdminProducts() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp"
+              accept="image/jpeg,image/png,image/webp,image/gif"
               multiple
               onChange={handleImageUpload}
               className="hidden"
