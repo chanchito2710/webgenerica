@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation, Navigate } from 'react-router-dom';
-import { LayoutDashboard, Package, FolderTree, ShoppingCart, Settings, ChevronLeft, Home, Menu, X, Wrench, HelpCircle, Users, Tag, MapPin, Shield } from 'lucide-react';
+import { LayoutDashboard, Package, FolderTree, ShoppingCart, Settings, ChevronLeft, Home, Menu, X, Wrench, HelpCircle, Users, Tag, MapPin, Shield, BookOpen } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
@@ -15,6 +15,7 @@ const navItems = [
   { to: '/admin/cupones', icon: Tag, label: 'Cupones' },
   { to: '/admin/pedidos', icon: ShoppingCart, label: 'Pedidos' },
   { to: '/admin/configuracion', icon: Settings, label: 'Configuración' },
+  { to: '/admin/ayuda', icon: BookOpen, label: 'Ayuda' },
 ];
 
 export default function AdminLayout() {

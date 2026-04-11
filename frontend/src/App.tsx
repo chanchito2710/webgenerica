@@ -30,6 +30,7 @@ import AdminFAQ from './pages/admin/AdminFAQ';
 import AdminAbout from './pages/admin/AdminAbout';
 import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminContact from './pages/admin/AdminContact';
+import AdminHelp from './pages/admin/AdminHelp';
 import SuperAdminLayout from './pages/superadmin/SuperAdminLayout';
 import SADashboard from './pages/superadmin/SADashboard';
 import SATenants from './pages/superadmin/SATenants';
@@ -81,6 +82,7 @@ export default function App() {
                     <Route path="categorias" element={<AdminCategories />} />
                     <Route path="pedidos" element={<AdminOrders />} />
                     <Route path="configuracion" element={<AdminConfig />} />
+                    <Route path="ayuda" element={<AdminHelp />} />
                   </Route>
 
                   <Route path="*" element={
