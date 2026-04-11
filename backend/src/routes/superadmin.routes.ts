@@ -6,6 +6,11 @@ import {
   getAdmins, createAdmin, updateAdmin, suspendAdmin, reactivateAdmin, deleteAdmin, resendActivation,
   getAuditLogs,
 } from '../controllers/superadmin.controller';
+import {
+  getTenantOrders,
+  getTenantOrderById,
+  getTenantCustomers,
+} from '../controllers/superadmin-tenant-data.controller';
 
 const router = Router();
 
@@ -15,6 +20,9 @@ router.get('/stats', getStats);
 
 router.get('/tenants', getTenants);
 router.post('/tenants', createTenant);
+router.get('/tenants/:tenantId/customers', getTenantCustomers);
+router.get('/tenants/:tenantId/orders', getTenantOrders);
+router.get('/tenants/:tenantId/orders/:orderId', getTenantOrderById);
 router.get('/tenants/:id', getTenantById);
 router.put('/tenants/:id', updateTenant);
 router.put('/tenants/:id/suspend', suspendTenant);

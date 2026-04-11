@@ -1,5 +1,5 @@
 import api from './api';
-import type { Tenant, AdminUser, PlatformStats, AuditLog } from '../types';
+import type { Tenant, AdminUser, PlatformStats, AuditLog, Order, TenantCustomer } from '../types';
 
 interface PaginatedTenants {
   tenants: Tenant[];
@@ -55,6 +55,33 @@ export const superadminService = {
   },
   async deleteTenant(id: number): Promise<void> {
     await api.delete(`/super-admin/tenants/${id}`);
+  },
+
+  async getTenantOrders(
+    tenantId: number,
+    params?: Record<string, string>,
+  ): Promise<{ orders: Order[]; total: number; page: number; pages: number }> {
+    const { data } = await api.get<{ orders: Order[]; total: number; page: number; pages: number }>(
+      `/super-admin/tenants/${tenantId}/orders`,
+      { params },
+    );
+    return data;
+  },
+  async getTenantOrder(tenantId: number, orderId: number): Promise<Order> {
+    const { data } = await api.get<Order>(`/super-admin/tenants/${tenantId}/orders/${orderId}`);
+    return data;
+  },
+  async getTenantCustomers(
+    tenantId: number,
+    params?: Record<string, string>,
+  ): Promise<{ customers: TenantCustomer[]; total: number; page: number; pages: number }> {
+    const { data } = await api.get<{
+      customers: TenantCustomer[];
+      total: number;
+      page: number;
+      pages: number;
+    }>(`/super-admin/tenants/${tenantId}/customers`, { params });
+    return data;
   },
 
   // Admins

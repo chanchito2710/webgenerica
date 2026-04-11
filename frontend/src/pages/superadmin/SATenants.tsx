@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pause, Play, Trash2, ExternalLink, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Plus, Pause, Play, Trash2, ExternalLink, Search, ShoppingCart, Users } from 'lucide-react';
 import { superadminService } from '../../services/superadmin.service';
 import type { Tenant } from '../../types';
 import toast from 'react-hot-toast';
@@ -122,6 +123,7 @@ export default function SATenants() {
                 <th className="text-center px-4 py-3 font-medium text-gray-500">Productos</th>
                 <th className="text-center px-4 py-3 font-medium text-gray-500">Pedidos</th>
                 <th className="text-center px-4 py-3 font-medium text-gray-500">Admins</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-500">Datos</th>
                 <th className="text-right px-4 py-3 font-medium text-gray-500">Acciones</th>
               </tr>
             </thead>
@@ -144,6 +146,22 @@ export default function SATenants() {
                   <td className="px-4 py-3 text-center">{t._count?.orders ?? 0}</td>
                   <td className="px-4 py-3 text-center">{t._count?.users ?? 0}</td>
                   <td className="px-4 py-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        to={`/super-admin/tenants/${t.id}/pedidos`}
+                        className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                      >
+                        <ShoppingCart size={14} /> Pedidos
+                      </Link>
+                      <Link
+                        to={`/super-admin/tenants/${t.id}/clientes`}
+                        className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                      >
+                        <Users size={14} /> Clientes
+                      </Link>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
                       {t.status === 'active' ? (
                         <button onClick={() => handleSuspend(t.id)} title="Suspender" className="p-1.5 text-amber-600 hover:bg-amber-50 rounded"><Pause size={16} /></button>
@@ -156,7 +174,7 @@ export default function SATenants() {
                 </tr>
               ))}
               {tenants.length === 0 && (
-                <tr><td colSpan={7} className="text-center py-8 text-gray-400">No hay tiendas</td></tr>
+                <tr><td colSpan={8} className="text-center py-8 text-gray-400">No hay tiendas</td></tr>
               )}
             </tbody>
           </table>

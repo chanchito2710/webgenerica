@@ -33,6 +33,8 @@ import AdminContact from './pages/admin/AdminContact';
 import SuperAdminLayout from './pages/superadmin/SuperAdminLayout';
 import SADashboard from './pages/superadmin/SADashboard';
 import SATenants from './pages/superadmin/SATenants';
+import SATenantOrders from './pages/superadmin/SATenantOrders';
+import SATenantCustomers from './pages/superadmin/SATenantCustomers';
 import SAAdmins from './pages/superadmin/SAAdmins';
 import SAAudit from './pages/superadmin/SAAudit';
 import FAQ from './pages/FAQ';
@@ -55,6 +57,8 @@ export default function App() {
                   <Route path="/super-admin/*" element={<SuperAdminLayout />}>
                     <Route index element={<SADashboard />} />
                     <Route path="tenants" element={<SATenants />} />
+                    <Route path="tenants/:tenantId/pedidos" element={<SATenantOrders />} />
+                    <Route path="tenants/:tenantId/clientes" element={<SATenantCustomers />} />
                     <Route path="admins" element={<SAAdmins />} />
                     <Route path="audit" element={<SAAudit />} />
                   </Route>

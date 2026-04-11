@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Prisma } from '../generated/prisma/client.js';
 import { prisma } from '../lib/prisma';
 import { sendOrderConfirmation } from '../services/email.service';
+import { orderIncludes } from '../lib/orderIncludes';
 
 function shippingAddressToStrings(addr: unknown): Record<string, string> {
   if (!addr || typeof addr !== 'object') return {};
@@ -9,11 +10,6 @@ function shippingAddressToStrings(addr: unknown): Record<string, string> {
     Object.entries(addr as Record<string, unknown>).map(([k, v]) => [k, v == null ? '' : String(v)]),
   );
 }
-
-const orderIncludes = {
-  items: { include: { product: { include: { images: { take: 1 } } }, variant: true } },
-  user: { select: { id: true, name: true, email: true } },
-};
 
 export async function createOrder(req: Request, res: Response) {
   try {

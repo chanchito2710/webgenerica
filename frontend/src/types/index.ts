@@ -196,6 +196,16 @@ export interface AdminUser {
   createdAt: string;
 }
 
+/** Cliente (rol customer) listado por super admin para una tienda */
+export interface TenantCustomer {
+  id: number;
+  email: string;
+  name: string;
+  isActive: boolean;
+  lastLoginAt: string | null;
+  createdAt: string;
+}
+
 export interface AuditLog {
   id: number;
   userId: number;
