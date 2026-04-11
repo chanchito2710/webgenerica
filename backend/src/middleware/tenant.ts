@@ -35,6 +35,36 @@ function setCache(key: string, tenant: TenantInfo) {
   tenantCache.set(key, { tenant, expiresAt: Date.now() + CACHE_TTL_MS });
 }
 
+/** Host “de la tienda” visto por el usuario. Con API en otro dominio (ej. onrender.com), Host es el del API; usamos Origin/Referer del navegador. */
+function getStorefrontHost(req: Request): string {
+  const forwarded = (req.headers['x-forwarded-host'] as string)?.split(':')[0]?.toLowerCase();
+  if (forwarded) return forwarded;
+
+  const apiHost = req.hostname.split(':')[0].toLowerCase();
+
+  const origin = req.headers.origin;
+  if (origin) {
+    try {
+      const h = new URL(origin).hostname.toLowerCase();
+      if (h && h !== apiHost) return h;
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const referer = req.headers.referer;
+  if (referer) {
+    try {
+      const h = new URL(referer).hostname.toLowerCase();
+      if (h && h !== apiHost) return h;
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return apiHost;
+}
+
 export function resolveTenant(req: Request, res: Response, next: NextFunction): void {
   const devSlug = req.headers['x-tenant-slug'] as string | undefined;
 
@@ -43,8 +73,7 @@ export function resolveTenant(req: Request, res: Response, next: NextFunction): 
     return;
   }
 
-  const host = (req.headers['x-forwarded-host'] as string) || req.hostname;
-  const cleanHost = host.split(':')[0].toLowerCase();
+  const cleanHost = getStorefrontHost(req);
 
   if (cleanHost === 'localhost' || cleanHost === '127.0.0.1') {
     resolveBySlug('default', req, res, next);
