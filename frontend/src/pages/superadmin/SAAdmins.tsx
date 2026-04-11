@@ -11,6 +11,7 @@ export default function SAAdmins() {
   const [search, setSearch] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', tenantId: '', activeImmediately: false });
+  const [revealedPassword, setRevealedPassword] = useState<{ email: string; password: string } | null>(null);
 
   const fetchAdmins = () => {
     setLoading(true);
@@ -39,9 +40,9 @@ export default function SAAdmins() {
       });
       if (form.activeImmediately && res.tempPassword) {
         toast.success('Admin creado y activado.');
-        window.alert(
-          `Guardá esta contraseña temporal (no se volverá a mostrar):\n\n${res.tempPassword}\n\nCompartila con el administrador por un canal seguro.`,
-        );
+        setRevealedPassword({ email: res.email, password: res.tempPassword });
+      } else if (form.activeImmediately && !res.tempPassword) {
+        toast.error('El servidor no devolvió contraseña. ¿Desplegaste el último backend con "activeImmediately"?');
       } else {
         toast.success('Admin creado. Email de activación enviado (si SMTP está configurado).');
       }
@@ -88,8 +89,42 @@ export default function SAAdmins() {
 
   const formatDate = (d: string | null) => d ? new Date(d).toLocaleDateString('es') : '-';
 
+  const copyPassword = () => {
+    if (!revealedPassword) return;
+    void navigator.clipboard.writeText(revealedPassword.password);
+    toast.success('Contraseña copiada al portapapeles');
+  };
+
   return (
     <div>
+      {revealedPassword && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" role="dialog" aria-modal="true" aria-labelledby="pwd-modal-title">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border-2 border-indigo-200">
+            <h2 id="pwd-modal-title" className="text-lg font-bold text-gray-900 mb-2">Contraseña temporal</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Guardala ahora: <strong>no se volverá a mostrar</strong>. Compartila con <strong>{revealedPassword.email}</strong> por un canal seguro.
+            </p>
+            <div className="flex items-center gap-2 mb-4">
+              <code className="flex-1 break-all text-sm bg-gray-100 border rounded-lg px-3 py-2 font-mono text-gray-900 select-all">
+                {revealedPassword.password}
+              </code>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={copyPassword} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
+                Copiar contraseña
+              </button>
+              <button
+                type="button"
+                onClick={() => setRevealedPassword(null)}
+                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm hover:bg-gray-300"
+              >
+                Entendido, cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Administradores</h1>
         <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">
