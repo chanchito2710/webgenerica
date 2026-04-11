@@ -7,6 +7,7 @@ import type { ContactPageConfig, SectionStyles } from '../../types';
 import ImageUploadZone from '../../components/admin/ImageUploadZone';
 import SectionStyleEditor from '../../components/admin/SectionStyleEditor';
 import DragList from '../../components/admin/DragList';
+import GuideSection from '../../components/guide/GuideSection';
 
 interface ContactForm extends Required<Omit<ContactPageConfig, 'heroStyles'>> {
   heroStyles?: SectionStyles;
@@ -61,6 +62,7 @@ export default function AdminContact() {
 
       <div className="space-y-6 max-w-3xl">
         {/* Phones with drag */}
+        <GuideSection sectionId="phones">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-800">Teléfonos</h2>
@@ -87,7 +89,10 @@ export default function AdminContact() {
           )}
         </div>
 
+        </GuideSection>
+
         {/* Map + hours */}
+        <GuideSection sectionId="map">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800">Mapa y horarios</h2>
           <div>
@@ -106,7 +111,10 @@ export default function AdminContact() {
           </div>
         </div>
 
+        </GuideSection>
+
         {/* Images */}
+        <GuideSection sectionId="images">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800">Imágenes</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -121,7 +129,10 @@ export default function AdminContact() {
           </div>
         </div>
 
+        </GuideSection>
+
         {/* Hero style */}
+        <GuideSection sectionId="hero-style">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800">Estilo del encabezado</h2>
           <SectionStyleEditor
@@ -129,6 +140,7 @@ export default function AdminContact() {
             onChange={(s) => setForm({ ...form, heroStyles: s })}
           />
         </div>
+        </GuideSection>
 
         <button onClick={save} className="bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary-dark transition-colors">
           Guardar Cambios

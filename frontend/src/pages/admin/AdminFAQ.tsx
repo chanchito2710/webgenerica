@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import SectionStyleEditor from '../../components/admin/SectionStyleEditor';
 import ImageUploadZone from '../../components/admin/ImageUploadZone';
 import DragList from '../../components/admin/DragList';
+import GuideSection from '../../components/guide/GuideSection';
 
 const DEFAULT_CONFIG: FaqPageConfig = {
   title: 'Preguntas Frecuentes',
@@ -69,6 +70,7 @@ export default function AdminFAQ() {
 
       <form onSubmit={handleSave} className="space-y-6 max-w-3xl">
         {/* Title & subtitle + hero styles */}
+        <GuideSection sectionId="header">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800">Encabezado de la página</h2>
           <div>
@@ -85,7 +87,10 @@ export default function AdminFAQ() {
           />
         </div>
 
+        </GuideSection>
+
         {/* FAQ items */}
+        <GuideSection sectionId="items">
         <div className="bg-white border rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-800">Preguntas ({data.items.length})</h2>
@@ -127,6 +132,7 @@ export default function AdminFAQ() {
             />
           )}
         </div>
+        </GuideSection>
 
         <button type="submit" disabled={saving} className="bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50">
           {saving ? 'Guardando...' : 'Guardar Cambios'}

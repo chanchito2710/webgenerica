@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import SectionStyleEditor from '../../components/admin/SectionStyleEditor';
 import ImageUploadZone from '../../components/admin/ImageUploadZone';
 import DragList from '../../components/admin/DragList';
+import GuideSection from '../../components/guide/GuideSection';
 
 const ICON_OPTIONS = [
   { value: 'smartphone', label: 'Celular' },
@@ -190,6 +191,7 @@ export default function AdminServicioTecnico() {
 
       <form onSubmit={handleSave} className="space-y-6 max-w-3xl">
         {/* Hero */}
+        <GuideSection sectionId="hero">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800">Banner principal</h2>
           <div>
@@ -216,7 +218,10 @@ export default function AdminServicioTecnico() {
           />
         </div>
 
+        </GuideSection>
+
         {/* Description */}
+        <GuideSection sectionId="desc">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800">Descripción</h2>
           <div>
@@ -229,7 +234,10 @@ export default function AdminServicioTecnico() {
           </div>
         </div>
 
+        </GuideSection>
+
         {/* Services */}
+        <GuideSection sectionId="services">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800">Servicios</h2>
           <div>
@@ -239,7 +247,10 @@ export default function AdminServicioTecnico() {
           <CardListEditor cards={data.services} onChange={(s) => updateField('services', s)} sectionLabel="servicio" />
         </div>
 
+        </GuideSection>
+
         {/* Benefits */}
+        <GuideSection sectionId="benefits">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800">Beneficios</h2>
           <div>
@@ -249,7 +260,10 @@ export default function AdminServicioTecnico() {
           <CardListEditor cards={data.benefits} onChange={(b) => updateField('benefits', b)} sectionLabel="beneficio" />
         </div>
 
+        </GuideSection>
+
         {/* CTA WhatsApp */}
+        <GuideSection sectionId="cta">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800">Llamada a la acción (WhatsApp)</h2>
           <div>
@@ -271,6 +285,7 @@ export default function AdminServicioTecnico() {
             showMobileBg={false}
           />
         </div>
+        </GuideSection>
 
         <button type="submit" disabled={saving} className="bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary-dark transition-colors disabled:opacity-50">
           {saving ? 'Guardando...' : 'Guardar Cambios'}

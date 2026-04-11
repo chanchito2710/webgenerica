@@ -8,6 +8,7 @@ import { Plus, Trash2, Truck, Upload, Palette, Share2, Image } from 'lucide-reac
 import toast from 'react-hot-toast';
 import { uploadHints } from '../../constants/upload';
 import { FONT_OPTIONS, loadGoogleFont } from '../../utils/fonts';
+import GuideSection from '../../components/guide/GuideSection';
 
 function generateId() {
   return `ship_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
@@ -107,6 +108,7 @@ export default function AdminConfig() {
 
       <form onSubmit={handleSubmit} className="space-y-8 max-w-2xl">
         {/* General config */}
+        <GuideSection sectionId="general">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800">Datos generales</h2>
           <div>
@@ -184,7 +186,10 @@ export default function AdminConfig() {
           )}
         </div>
 
+        </GuideSection>
+
         {/* Social links (FASE 5B) */}
+        <GuideSection sectionId="social">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
             <Share2 size={20} /> Redes sociales
@@ -234,7 +239,10 @@ export default function AdminConfig() {
           </div>
         </div>
 
+        </GuideSection>
+
         {/* Theme / colors (FASE 5C) */}
+        <GuideSection sectionId="theme">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
             <Palette size={20} /> Colores del tema
@@ -326,7 +334,10 @@ export default function AdminConfig() {
           </div>
         </div>
 
+        </GuideSection>
+
         {/* Footer description (FASE 5F) */}
+        <GuideSection sectionId="footer">
         <div className="bg-white border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-800">Texto del pie de página</h2>
           <p className="text-sm text-gray-500">Descripción breve que aparece en el footer del sitio.</p>
@@ -342,7 +353,10 @@ export default function AdminConfig() {
           </div>
         </div>
 
+        </GuideSection>
+
         {/* Shipping options */}
+        <GuideSection sectionId="shipping">
         <div className="bg-white border rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
@@ -405,6 +419,7 @@ export default function AdminConfig() {
             </div>
           )}
         </div>
+        </GuideSection>
 
         <button type="submit" className="bg-primary text-white px-6 py-2.5 rounded-lg font-medium hover:bg-primary-dark transition-colors">
           Guardar Cambios
