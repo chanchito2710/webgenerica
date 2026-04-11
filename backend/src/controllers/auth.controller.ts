@@ -57,6 +57,13 @@ export async function login(req: Request, res: Response) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
+    // Solo super_admin puede entrar desde cualquier dominio; admin/customer solo desde su tienda
+    if (user.role !== 'super_admin') {
+      if (user.tenantId == null || user.tenantId !== req.tenantId) {
+        return res.status(401).json({ error: 'Esta cuenta no pertenece a esta tienda' });
+      }
+    }
+
     await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
 
     const token = signToken({ userId: user.id, role: user.role, tenantId: user.tenantId });
