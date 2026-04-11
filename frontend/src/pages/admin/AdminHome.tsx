@@ -11,6 +11,7 @@ import { FONT_OPTIONS, loadGoogleFont } from '../../utils/fonts';
 import type { HeroSlide, HeroButton, SlideStyles, SlideLayout, SlideCustomText, Benefit, Product, InstagramSection, PromoBanner } from '../../types';
 import toast from 'react-hot-toast';
 import { uploadHints } from '../../constants/upload';
+import GuideSection from '../../components/guide/GuideSection';
 
 const ICON_OPTIONS = [
   { value: 'truck', label: 'Camión (envíos)' },
@@ -810,7 +811,8 @@ export default function AdminHome() {
       </div>
 
       {/* Hero Carousel Slides */}
-      <div className="bg-white border rounded-lg p-6 mb-6">
+      <GuideSection sectionId="hero" className="mb-6">
+      <div className="bg-white border rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
             <Image size={20} /> Carrusel de Banners
@@ -1083,9 +1085,11 @@ export default function AdminHome() {
           </div>
         )}
       </div>
+      </GuideSection>
 
       {/* Benefits */}
-      <div className="bg-white border rounded-lg p-6 mb-6">
+      <GuideSection sectionId="benefits" className="mb-6">
+      <div className="bg-white border rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-800">Tarjetas de Beneficios</h2>
           <button onClick={addBenefit} className="flex items-center gap-1 text-sm text-primary hover:underline font-medium">
@@ -1162,9 +1166,11 @@ export default function AdminHome() {
           </div>
         )}
       </div>
+      </GuideSection>
 
       {/* Sección Instagram */}
-      <div className="bg-white border rounded-lg p-6 mb-6">
+      <GuideSection sectionId="instagram" className="mb-6">
+      <div className="bg-white border rounded-lg p-6">
         <button
           type="button"
           onClick={() => setInstagramOpen(!instagramOpen)}
@@ -1219,8 +1225,10 @@ export default function AdminHome() {
           </div>
         )}
       </div>
+      </GuideSection>
 
       {/* Banner promocional */}
+      <GuideSection sectionId="promo">
       <div className="bg-white border rounded-lg p-6">
         <button
           type="button"
@@ -1314,6 +1322,7 @@ export default function AdminHome() {
           </div>
         )}
       </div>
+      </GuideSection>
     </div>
   );
 }
