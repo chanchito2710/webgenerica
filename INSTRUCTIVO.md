@@ -2,9 +2,9 @@
 
 ## Que es WebGenerica
 
-WebGenerica es una plataforma e-commerce lista para usar. Funciona como una tienda online completa que se puede personalizar para cualquier tipo de negocio **sin tocar codigo**. Todo se configura desde el panel de administracion.
+WebGenerica es una plataforma e-commerce multi-tenant lista para usar. Funciona como una tienda online completa que se puede personalizar para cualquier tipo de negocio **sin tocar codigo**. Todo se configura desde el panel de administracion.
 
-La tienda incluye: catalogo de productos, carrito de compras, checkout con opciones de envio, sistema de cupones, paginas informativas (FAQ, Contacto, Quienes Somos, Servicio Tecnico) y un panel admin completo.
+La tienda incluye: catalogo de productos, carrito de compras, checkout con opciones de envio, sistema de cupones, paginas informativas (FAQ, Contacto, Quienes Somos, Servicio Tecnico), panel admin completo con personalizacion visual, sistema multi-tenant con panel de Super Admin, y modo guia interactivo.
 
 ---
 
@@ -14,6 +14,7 @@ La tienda incluye: catalogo de productos, carrito de compras, checkout con opcio
 |-----|-----|
 | Tienda (produccion) | https://webgenerica.vercel.app |
 | Panel Admin | https://webgenerica.vercel.app/login |
+| Super Admin | https://webgenerica.vercel.app/super-admin |
 | API Backend | https://webgenerica-api.onrender.com |
 | Repositorio | https://github.com/chanchito2710/webgenerica |
 
@@ -37,18 +38,28 @@ La tienda incluye: catalogo de productos, carrito de compras, checkout con opcio
 | Carrito | `/carrito` | Items, cantidades, opciones de envio, resumen |
 | Checkout | `/checkout` | Formulario de datos, direccion, metodo de pago |
 | Confirmacion | `/orden-confirmada` | Resumen de la orden completada |
-| Servicio Tecnico | `/servicio-tecnico` | Info del servicio, CTA de WhatsApp |
-| Preguntas Frecuentes | `/preguntas-frecuentes` | Acordeon de preguntas/respuestas |
-| Contacto | `/contacto` | Telefonos, mapa Google Maps, horarios |
-| Quienes Somos | `/quienes-somos` | Historia, imagen, puntos destacados |
+| Servicio Tecnico | `/servicio-tecnico` | Info del servicio con estilos personalizables, CTA de WhatsApp |
+| Preguntas Frecuentes | `/preguntas-frecuentes` | Acordeon de preguntas/respuestas con imagenes opcionales |
+| Contacto | `/contacto` | Telefonos, mapa Google Maps, horarios, con hero personalizable |
+| Quienes Somos | `/quienes-somos` | Historia, imagen desktop/mobile, puntos destacados, hero personalizable |
 | Login / Registro | `/login`, `/registro` | Acceso y creacion de cuenta |
 | Mis Pedidos | `/mis-pedidos` | Historial de compras del usuario |
+
+Las paginas informativas (Servicio Tecnico, FAQ, Contacto, Quienes Somos) aplican los estilos de seccion configurados por el admin (colores, fuentes, imagenes de fondo).
 
 ---
 
 ## Panel de Administracion
 
 Se accede desde el boton "Administrador" en el header (visible solo si estas logueado como admin). El panel tiene las siguientes secciones:
+
+### Modo Guia
+
+Todas las paginas del admin incluyen un boton **"Modo guia"** en la parte superior. Al activarlo:
+- Aparecen chips con las secciones disponibles en esa pagina.
+- Al seleccionar una seccion, se resalta el bloque correspondiente y se atenuan los demas.
+- Se muestra una descripcion breve de que es y que se puede hacer en esa seccion.
+- Util para administradores que recien empiezan a usar el panel.
 
 ### Dashboard (`/admin`)
 
@@ -85,18 +96,47 @@ Controla todo lo que se ve en la pagina principal:
 - URL y texto del enlace
 - Se muestra como un banner ancho con gradiente
 
+### Editar Servicio Tecnico (`/admin/servicio`)
+
+- **Banner principal**: titulo, subtitulo, imagenes de fondo (escritorio + celular), estilos de seccion (colores de fondo/texto, fuentes)
+- **Descripcion**: titulo de seccion + cuerpo de texto
+- **Tarjetas de servicios**: icono predefinido o personalizado (subir imagen), imagen opcional por tarjeta, drag-and-drop para reordenar
+- **Tarjetas de beneficios**: misma estructura que servicios, con drag-and-drop
+- **CTA WhatsApp**: titulo, subtitulo, mensaje predeterminado, estilos personalizables (el numero viene de la config general)
+
+### Editar FAQ (`/admin/faq`)
+
+- **Encabezado**: titulo, subtitulo, estilos personalizables (colores, fuentes, imagen de fondo)
+- **Preguntas**: agregar, editar y eliminar. Cada pregunta puede tener una imagen opcional. Reordenar con drag-and-drop
+
+### Editar Quienes Somos (`/admin/nosotros`)
+
+- **Contenido**: titulo, subtitulo, descripcion del negocio
+- **Imagenes**: imagen principal para escritorio + version para celular
+- **Puntos destacados**: frases cortas reordenables con drag-and-drop
+- **Estilo del encabezado**: colores, fuentes e imagen de fondo del hero
+
+### Editar Contacto (`/admin/contacto`)
+
+- **Telefonos**: lista reordenable con drag-and-drop
+- **Mapa y horarios**: URL de Google Maps embebido (con vista previa) + horarios de atencion
+- **Imagenes**: imagen de seccion para escritorio y celular
+- **Estilo del encabezado**: colores, fuentes e imagen de fondo
+
 ### Productos (`/admin/productos`)
 
 - Crear, editar y eliminar productos
 - Campos: nombre, descripcion, precio, precio oferta, stock, categoria, destacado, activo
-- Subir multiples fotos (JPG/PNG/WebP, max 5MB, recomendado 800x800)
+- Subir multiples fotos (JPG/PNG/WebP/GIF, max 5MB, recomendado 800x800)
+- Validacion de peso del archivo antes de subir (avisa si supera 5 MB)
 - Reordenar fotos (la primera es la principal)
 - El slug se genera automaticamente del nombre
 
 ### Categorias (`/admin/categorias`)
 
 - Crear, editar y eliminar categorias
-- Campos: nombre e imagen (por URL)
+- Campos: nombre e imagen (subida directa, no URL)
+- La tabla muestra una miniatura de la imagen junto al nombre
 - El slug se genera automaticamente
 - No se puede borrar una categoria si tiene productos asociados
 
@@ -113,32 +153,6 @@ Controla todo lo que se ve en la pagina principal:
 - Compra minima, usos maximos (0 = ilimitado), fecha de expiracion
 - Activar/desactivar rapidamente desde la lista
 
-### Editar FAQ (`/admin/faq`)
-
-- Titulo y subtitulo de la pagina
-- Lista de preguntas y respuestas
-- Reordenar con flechas, agregar y eliminar
-
-### Editar Contacto (`/admin/contacto`)
-
-- Lista de telefonos de contacto
-- URL de Google Maps embebido (con vista previa)
-- Horarios de atencion (texto libre)
-
-### Editar Quienes Somos (`/admin/nosotros`)
-
-- Titulo, subtitulo, descripcion larga
-- Imagen (subir archivo)
-- Lista de puntos destacados
-
-### Editar Servicio Tecnico (`/admin/servicio`)
-
-- Hero: titulo y subtitulo
-- Descripcion: titulo de seccion + cuerpo
-- Tarjetas de servicios: icono (de lista predefinida), titulo, descripcion
-- Tarjetas de beneficios: misma estructura
-- CTA WhatsApp: titulo, subtitulo, mensaje predeterminado (el numero viene de la config general)
-
 ### Configuracion General (`/admin/configuracion`)
 
 - **Nombre del sitio** (aparece en header, footer, titulo del navegador)
@@ -146,20 +160,70 @@ Controla todo lo que se ve en la pagina principal:
 - **Datos de contacto**: telefono, email, direccion
 - **Moneda**: simbolo (ej: `$`, `US$`, `€`)
 - **Redes sociales**: URLs de Instagram, Facebook, Twitter/X, TikTok
-- **Colores del tema**: color primario y color de acento (selector de color)
+- **Colores del tema**: color primario y color de acento. Se aplican automaticamente en toda la tienda (botones, enlaces, fondos, etc.)
+- **Tipografia global**: fuente para titulos y fuente para cuerpo de texto, seleccionables entre fuentes populares de Google Fonts, con vista previa en vivo
 - **Descripcion del footer**: texto que aparece debajo del logo en el pie de pagina
 - **Opciones de envio**: lista con nombre, costo y descripcion (aparecen en el carrito y checkout)
+
+### Ayuda (`/admin/ayuda`)
+
+Seccion de referencia con explicacion detallada de cada seccion del panel, que se puede hacer y como hacerlo. Incluye consejos sobre drag-and-drop, estilos de seccion y tema global.
+
+---
+
+## Sistema de tema global
+
+El administrador puede personalizar la identidad visual de toda la tienda desde Configuracion:
+
+- **Colores**: primario y acento. Se inyectan como CSS custom properties y se aplican en tiempo real a toda la tienda (botones, enlaces, badges, fondos).
+- **Fuentes**: titulo (h1-h6) y cuerpo (body). Se cargan desde Google Fonts y se aplican globalmente.
+- **Estilos por seccion**: cada pagina informativa tiene un panel de estilos donde se pueden personalizar colores de fondo, texto, titulos, fuentes e imagenes de fondo (escritorio + celular). Los estilos por seccion tienen prioridad sobre el tema global.
+
+---
+
+## Componentes reutilizables del admin
+
+El panel usa componentes compartidos para mantener consistencia:
+
+- **ImageUploadZone**: zona de subida con preview, cambiar y quitar imagen
+- **ColorPickerField**: selector de color con input hex y boton quitar
+- **FontSelect**: selector de fuentes Google con preview en vivo
+- **SectionStyleEditor**: editor completo de estilos de seccion (colores, fuentes, fondos)
+- **DragList**: lista generica con drag-and-drop para reordenar cualquier tipo de item
+
+---
+
+## Super Admin (`/super-admin`)
+
+Panel de gestion de la plataforma multi-tenant. Solo accesible con rol `super_admin`.
+
+### Tiendas (`/super-admin/tenants`)
+- Crear, editar, suspender, reactivar y eliminar tiendas
+- Cada tienda tiene: nombre, slug, dominio personalizado, plan y estado
+- Ver cantidad de productos, pedidos y admins por tienda
+- Acceso a pedidos y clientes de cada tienda
+
+### Admins (`/super-admin/admins`)
+- Crear y gestionar administradores asignados a tiendas
+
+### Auditoria (`/super-admin/audit`)
+- Log de acciones administrativas
+
+### Dominios personalizados
+- Cada tienda puede tener un dominio propio (ej: `prueba.juanitaaccesorios.com`)
+- El backend resuelve automaticamente el tenant por dominio
+- Los dominios se configuran desde el panel de Super Admin y deben apuntar a Vercel via DNS
 
 ---
 
 ## Como personalizar la tienda para un cliente nuevo
 
-1. **Entrar al admin** con `admin@webgenerica.com` / `admin123`
-2. **Configuracion General**: cambiar nombre, logo, colores, contacto, redes, moneda
+1. **Entrar al admin** con las credenciales de administrador
+2. **Configuracion General**: cambiar nombre, logo, colores, fuentes, contacto, redes, moneda
 3. **Editar Inicio**: armar el carrusel hero con las imagenes del negocio, ajustar beneficios
-4. **Categorias**: crear las categorias del negocio
+4. **Categorias**: crear las categorias del negocio (con imagenes)
 5. **Productos**: cargar productos con fotos, precios y descripcion
-6. **Paginas informativas**: editar FAQ, Contacto (mapa, telefonos), Quienes Somos, Servicio Tecnico
+6. **Paginas informativas**: editar FAQ, Contacto (mapa, telefonos), Quienes Somos, Servicio Tecnico. Cada una permite personalizar estilos del hero (colores, fuentes, fondo)
 7. **Opciones de envio**: configurar en la seccion de Configuracion
 8. **Cupones**: crear codigos de descuento si se necesitan
 
@@ -177,35 +241,27 @@ Con estos pasos, la tienda queda completamente adaptada al nuevo cliente sin toc
 **Problema:** El modelo de datos soporta variantes (talle, color, etc.) pero el formulario de admin no permite crearlas ni editarlas.
 **Solucion:** Agregar seccion de variantes al formulario de productos en `AdminProducts.tsx`.
 
-### 3. Imagenes de categorias por URL
-**Problema:** Las categorias requieren pegar una URL de imagen en vez de subirla como en productos.
-**Solucion:** Integrar el mismo componente de upload que usan los productos.
-
-### 4. Sin gestion de pagos real
+### 3. Sin gestion de pagos real
 **Problema:** El checkout no procesa pagos reales. Solo registra la orden con metodo de pago seleccionado.
 **Solucion:** Integrar **MercadoPago** (ideal para Uruguay/Latam) o **Stripe** como pasarela de pagos.
 
-### 5. Sin notificaciones por email
+### 4. Sin notificaciones por email
 **Problema:** El backend tiene el servicio de email configurado (nodemailer) pero no envia emails transaccionales automaticos.
 **Solucion:** Configurar SMTP y activar envio de emails en confirmacion de orden, cambio de estado, etc.
 
-### 6. Backend se duerme (Render Free)
+### 5. Backend se duerme (Render Free)
 **Problema:** El backend en Render Free se apaga tras 15 minutos sin uso. La primera visita tarda ~30 segundos en cargar.
 **Solucion:** Upgrade a Render Starter ($7/mes) para mantener el servicio siempre activo, o usar un servicio de "ping" externo como UptimeRobot.
 
-### 7. Base de datos expira en 90 dias
+### 6. Base de datos expira en 90 dias
 **Problema:** PostgreSQL en Render Free expira a los 90 dias.
 **Solucion:** Antes de que expire, migrar a **Supabase** (tier gratis permanente con 500MB), **Neon** (tier gratis), o upgrade en Render.
 
-### 8. Sin busqueda avanzada con imagenes
-**Problema:** La busqueda funciona por texto pero los resultados del seed no tienen imagenes cargadas.
-**Solucion:** Subir imagenes de productos desde el admin. La busqueda mostrara las miniaturas automaticamente.
-
-### 9. Limite de 100 productos/pedidos en listados admin
+### 7. Limite de 100 productos/pedidos en listados admin
 **Problema:** Los listados del admin cargan hasta 100 registros. Con mas datos, no se ven todos.
 **Solucion:** Implementar paginacion en los listados del admin.
 
-### 10. Sin sistema de roles granular
+### 8. Sin sistema de roles granular
 **Problema:** Solo hay dos roles: `admin` y `customer`. No hay roles intermedios (ej: vendedor, soporte).
 **Solucion:** Agregar tabla de roles/permisos y middleware de autorizacion.
 
